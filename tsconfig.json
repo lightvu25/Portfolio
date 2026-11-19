@@ -19,16 +19,39 @@
       }
     ],
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "@pxlkit/core": ["./asset/components/packages/core/src/index.ts"],
+      "@pxlkit/gamification": ["./asset/components/packages/gamification/src/index.ts"],
+      "@pxlkit/ui": ["./asset/components/packages/ui/src/index.ts"],
+      "@pxlkit/effects": ["./asset/components/packages/effects/src/index.ts"],
+      "@pxlkit/feedback": ["./asset/components/packages/feedback/src/index.ts"],
+      "@pxlkit/social": ["./asset/components/packages/social/src/index.ts"],
+      "@pxlkit/parallax": ["./asset/components/packages/parallax/src/index.ts"],
+      "@pxlkit/ui-kit/common": ["./asset/components/packages/ui-kit/src/common.tsx"],
+      "@pxlkit/ui-kit/tokens": ["./asset/components/packages/ui-kit/src/tokens.ts"],
+      "@pxlkit/ui-kit/locale": ["./asset/components/packages/ui-kit/src/locale.tsx"],
+      "@pxlkit/ui-kit/actions": ["./asset/components/packages/ui-kit/src/actions/index.ts"],
+      "@pxlkit/ui-kit/data-display": ["./asset/components/packages/ui-kit/src/data-display/index.ts"],
+      "@pxlkit/ui-kit/feedback": ["./asset/components/packages/ui-kit/src/feedback/index.ts"],
+      "@pxlkit/ui-kit/toast": ["./asset/components/packages/ui-kit/src/toast.tsx"],
+      "@pxlkit/ui-kit/cards/PixelIconFrame": ["./asset/components/packages/ui-kit/src/cards/PixelIconFrame.tsx"]
     }
   },
   "include": [
     "next-env.d.ts",
-    "**/*.ts",
-    "**/*.tsx",
+    "src/**/*.ts",
+    "src/**/*.tsx",
     ".next/types/**/*.ts",
     ".next/dev/types/**/*.ts",
     "**/*.mts"
   ],
-  "exclude": ["node_modules"]
+  "exclude": [
+    "node_modules",
+    "asset/components/apps",
+    "asset/components/docs",
+    "asset/components/scripts",
+    "asset/components/packages/**/__tests__",
+    "asset/components/packages/**/*.examples.tsx",
+    "asset/components/packages/**/*.manifest.ts"
+  ]
 }

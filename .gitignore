@@ -2,6 +2,7 @@
 
 # dependencies
 /node_modules
+**/node_modules/
 /.pnp
 .pnp.*
 .yarn/*
@@ -10,32 +11,69 @@
 !.yarn/releases
 !.yarn/versions
 
-# testing
+# testing & verification artifacts
 /coverage
+/.verify-screenshots/
+/playwright-report/
+/test-results/
+/blob-report/
+/playwright/.cache/
 
-# next.js
+# next.js & static export
 /.next/
 /out/
+/build/
+/.turbo/
 
-# production
-/build
+# local AI agent / IDE folders
+/.agent/
+/.agents/
+/.claude/
+/.cursor/
+/.idea/
+/.vscode/*
+!.vscode/extensions.json
 
-# misc
+# OS & editor temp files
 .DS_Store
+Thumbs.db
+Desktop.ini
 *.pem
+*.swp
+*.swo
+*~
 
-# debug
+# debug logs
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
-# env files (can opt-in for committing if needed)
+# env files (keep .env.example tracked)
 .env*
+!.env.example
 
-# vercel
+# deployment
 .vercel
+.netlify
 
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# unused pxlkit monorepo clutter (keep packages/*/src & licenses, and keep variable fonts in asset/fonts/)
+/asset/components/.github/
+/asset/components/.storybook/
+/asset/components/.gitignore
+/asset/components/.vercelignore
+/asset/components/apps/
+/asset/components/docs/
+/asset/components/scripts/
+/asset/components/package-lock.json
+/asset/components/turbo.json
+/asset/components/validate-icons.js
+/asset/components/packages/**/dist/
+/asset/components/packages/**/__tests__/
+/asset/components/packages/**/*.examples.tsx
+/asset/components/packages/**/*.manifest.ts
+/asset/fonts/**/static/

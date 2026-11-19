@@ -1,26 +1,481 @@
-@import "tailwindcss";
+@import "tailwindcss" source("../");
+
+/* Scan only the exact @pxlkit/ui-kit source files imported by Game Portfolio */
+@source "../../asset/components/packages/ui-kit/src/common.tsx";
+@source "../../asset/components/packages/ui-kit/src/tokens.ts";
+@source "../../asset/components/packages/ui-kit/src/toast.tsx";
+@source "../../asset/components/packages/ui-kit/src/actions/PixelButton.tsx";
+@source "../../asset/components/packages/ui-kit/src/actions/PixelIconButton.tsx";
+@source "../../asset/components/packages/ui-kit/src/data-display/PixelBadge.tsx";
+@source "../../asset/components/packages/ui-kit/src/data-display/PixelCard.tsx";
+@source "../../asset/components/packages/ui-kit/src/data-display/_internal/variantClasses.ts";
+@source "../../asset/components/packages/ui-kit/src/cards/PixelRibbon.tsx";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --paper: #f6f4ef;
+  --paper-2: #ece8df;
+  --paper-card: #faf9f6;
+  --ink: #141413;
+  --ink-muted: #57544e;
+  --ink-subtle: #736f68;
+  --line: #dcd7cc;
+  --line-strong: #beb8aa;
+  --accent: #2b3ae8;
+  --accent-hover: #1e2bc2;
+  --accent-soft: #e6e8fc;
+  --pixel-amber: #f29d18;
+  --success: #166534;
+  --success-bg: #ecfdf3;
+  --danger: #b91c1c;
+  --danger-bg: #fef2f2;
+  --demo: #92400e;
+  --demo-bg: #fffbeb;
+
+  /* Default font variables (overridden per route-group shell) */
+  --active-font-sans: var(--font-body), ui-sans-serif, system-ui, sans-serif;
+  --active-font-display: var(--font-heading), var(--font-body), ui-sans-serif, system-ui, sans-serif;
+  --active-font-mono: var(--font-plex-mono), ui-monospace, SFMono-Regular, monospace;
+  --active-font-pixel: var(--font-silkscreen), var(--font-plex-mono), monospace;
+
+  /* Default Pxlkit retro tokens (overridden inside .game-portfolio-root) */
+  --retro-bg: #04060a;
+  --retro-surface: #0a101b;
+  --retro-card: #0f1726;
+  --retro-text: #ecf4ff;
+  --retro-border: #1f2e4d;
+  --retro-border-strong: #374e7d;
+  --retro-primary: #00f0ff;
+  --retro-secondary: #ffb800;
+  --retro-accent: #00ff88;
+  --retro-muted: #8fa5ce;
+  --retro-green: #00ff88;
+  --retro-green-hover: #00cc6a;
+  --retro-cyan: #00e5ff;
+  --retro-red: #ff4d6d;
+  --retro-gold: #ffb800;
+  --retro-purple: #b86bff;
+  --retro-pink: #ff2e93;
+  --retro-shadow-green: rgba(0, 255, 136, 0.35);
+  --retro-shadow-green-lg: rgba(0, 255, 136, 0.22);
+  --retro-shadow-gold: rgba(255, 184, 0, 0.35);
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-paper: var(--paper);
+  --color-paper-2: var(--paper-2);
+  --color-paper-card: var(--paper-card);
+  --color-ink: var(--ink);
+  --color-ink-muted: var(--ink-muted);
+  --color-ink-subtle: var(--ink-subtle);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-accent-soft: var(--accent-soft);
+  --color-pixel: var(--pixel-amber);
+  --color-success: var(--success);
+  --color-success-bg: var(--success-bg);
+  --color-danger: var(--danger);
+  --color-danger-bg: var(--danger-bg);
+  --color-demo: var(--demo);
+  --color-demo-bg: var(--demo-bg);
+
+  /* Pxlkit design tokens */
+  --color-retro-bg: var(--retro-bg);
+  --color-retro-surface: var(--retro-surface);
+  --color-retro-card: var(--retro-card);
+  --color-retro-text: var(--retro-text);
+  --color-retro-border: var(--retro-border);
+  --color-retro-border-strong: var(--retro-border-strong);
+  --color-retro-primary: var(--retro-primary);
+  --color-retro-secondary: var(--retro-secondary);
+  --color-retro-accent: var(--retro-accent);
+  --color-retro-muted: var(--retro-muted);
+  --color-retro-green: var(--retro-green);
+  --color-retro-green-hover: var(--retro-green-hover);
+  --color-retro-cyan: var(--retro-cyan);
+  --color-retro-red: var(--retro-red);
+  --color-retro-gold: var(--retro-gold);
+  --color-retro-purple: var(--retro-purple);
+  --color-retro-pink: var(--retro-pink);
+
+  /* Dynamic per-experience font mappings */
+  --font-sans: var(--active-font-sans);
+  --font-display: var(--active-font-display);
+  --font-mono: var(--active-font-mono);
+  --font-pixel: var(--active-font-pixel);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+/* ──────────────────────────────────────────────────────────────────────────
+   Route Group Theme Scopes
+   ────────────────────────────────────────────────────────────────────────── */
+
+.web-service-root {
+  color-scheme: light;
+  background-color: var(--paper);
+  color: var(--ink);
+  --active-font-sans: var(--font-body), ui-sans-serif, system-ui, sans-serif;
+  --active-font-display: var(--font-heading), var(--font-body), ui-sans-serif, system-ui, sans-serif;
+  --active-font-mono: var(--font-plex-mono), ui-monospace, SFMono-Regular, monospace;
+  --active-font-pixel: var(--font-silkscreen), var(--font-plex-mono), monospace;
+  font-family: var(--active-font-sans);
+}
+
+.game-portfolio-root {
+  color-scheme: dark;
+  background-color: #04060a;
+  color: #ecf4ff;
+  --active-font-sans: var(--font-pixel-sans), var(--font-handjet), ui-monospace, monospace;
+  --active-font-display: var(--font-handjet), var(--font-pixel-sans), ui-monospace, monospace;
+  --active-font-mono: var(--font-pixel-sans), var(--font-handjet), ui-monospace, monospace;
+  --active-font-pixel: var(--font-handjet), var(--font-pixel-sans), ui-monospace, monospace;
+  font-family: var(--active-font-sans);
+}
+
+html {
+  background-color: var(--paper);
+  color: var(--ink);
+  overflow-x: clip;
+}
+
+html:has(.game-portfolio-root),
+body:has(.game-portfolio-root) {
+  background-color: #04060a;
+  color: #ecf4ff;
+  color-scheme: dark;
+}
+
+html:has(.web-service-root) {
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html:has(.web-service-root) {
+    scroll-behavior: auto;
   }
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: clip;
+}
+
+.web-service-root ::selection {
+  background-color: var(--accent-soft);
+  color: var(--ink);
+}
+
+.game-portfolio-root ::selection {
+  background-color: rgba(0, 240, 255, 0.25);
+  color: #00f0ff;
+}
+
+.font-pixel-grid {
+  font-family: var(--font-handjet), var(--font-pixel-sans), ui-monospace, monospace;
+  font-variation-settings: "ELGR" 2, "ELSH" 2;
+}
+
+/* Visible, consistent keyboard focus indicators */
+.web-service-root :focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+.game-portfolio-root :focus-visible {
+  outline: 2px solid #00f0ff;
+  outline-offset: 2px;
+}
+
+/* Hide native mouse cursor only when custom pixel pointer is active on fine-pointer desktop */
+@media (hover: hover) and (pointer: fine) {
+  html.pixel-cursor-active,
+  html.pixel-cursor-active * {
+    cursor: none !important;
+  }
+}
+
+/* ──────────────────────────────────────────────────────────────────────────
+   @pxlkit/ui-kit Pixel Corner & Shadow Primitives
+   ────────────────────────────────────────────────────────────────────────── */
+@layer utilities {
+  .pxl-corner-sm {
+    clip-path: polygon(
+      2px 0,
+      calc(100% - 2px) 0,
+      calc(100% - 2px) 2px,
+      100% 2px,
+      100% calc(100% - 2px),
+      calc(100% - 2px) calc(100% - 2px),
+      calc(100% - 2px) 100%,
+      2px 100%,
+      2px calc(100% - 2px),
+      0 calc(100% - 2px),
+      0 2px,
+      2px 2px
+    );
+  }
+
+  .pxl-corner-md {
+    clip-path: polygon(
+      4px 0,
+      calc(100% - 4px) 0,
+      calc(100% - 4px) 2px,
+      calc(100% - 2px) 2px,
+      calc(100% - 2px) 4px,
+      100% 4px,
+      100% calc(100% - 4px),
+      calc(100% - 2px) calc(100% - 4px),
+      calc(100% - 2px) calc(100% - 2px),
+      calc(100% - 4px) calc(100% - 2px),
+      calc(100% - 4px) 100%,
+      4px 100%,
+      4px calc(100% - 2px),
+      2px calc(100% - 2px),
+      2px calc(100% - 4px),
+      0 calc(100% - 4px),
+      0 4px,
+      2px 4px,
+      2px 2px,
+      4px 2px
+    );
+  }
+
+  .pxl-corner-lg {
+    clip-path: polygon(
+      6px 0,
+      calc(100% - 6px) 0,
+      calc(100% - 6px) 2px,
+      calc(100% - 4px) 2px,
+      calc(100% - 4px) 4px,
+      calc(100% - 2px) 4px,
+      calc(100% - 2px) 6px,
+      100% 6px,
+      100% calc(100% - 6px),
+      calc(100% - 2px) calc(100% - 6px),
+      calc(100% - 2px) calc(100% - 4px),
+      calc(100% - 4px) calc(100% - 4px),
+      calc(100% - 4px) calc(100% - 2px),
+      calc(100% - 6px) calc(100% - 2px),
+      calc(100% - 6px) 100%,
+      6px 100%,
+      6px calc(100% - 2px),
+      4px calc(100% - 2px),
+      4px calc(100% - 4px),
+      2px calc(100% - 4px),
+      2px calc(100% - 6px),
+      0 calc(100% - 6px),
+      0 6px,
+      2px 6px,
+      2px 4px,
+      4px 4px,
+      4px 2px,
+      6px 2px
+    );
+  }
+
+  .pxl-shadow {
+    filter: drop-shadow(3px 3px 0 rgba(0, 0, 0, 0.55));
+  }
+
+  .pxl-shadow-hover:hover {
+    filter: drop-shadow(2px 2px 0 rgba(0, 240, 255, 0.35));
+    transform: translate(1px, 1px);
+  }
+
+  .pxl-shadow-active:active {
+    filter: drop-shadow(1px 1px 0 rgba(0, 240, 255, 0.45));
+    transform: translate(2px, 2px);
+  }
+}
+
+@keyframes pxl-spinner-steps {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes pxl-spinner-smooth {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Custom pixel scrollbar inside long Game Project description panels */
+.pixel-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: var(--game-accent, #00ff88) rgba(15, 23, 38, 0.8);
+}
+
+.pixel-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.pixel-scrollbar::-webkit-scrollbar-track {
+  background: rgba(10, 16, 27, 0.85);
+  border-left: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.pixel-scrollbar::-webkit-scrollbar-thumb {
+  background: var(--game-accent, #00ff88);
+}
+
+/* ──────────────────────────────────────────────────────────────────────────
+   Web Service Legacy Primitives (Preserved)
+   ────────────────────────────────────────────────────────────────────────── */
+.pixel-btn {
+  position: relative;
+  transition:
+    transform 140ms cubic-bezier(0.2, 0.7, 0.2, 1),
+    background-color 140ms ease,
+    border-color 140ms ease,
+    color 140ms ease,
+    box-shadow 140ms cubic-bezier(0.2, 0.7, 0.2, 1);
+  box-shadow: 3px 3px 0 0 var(--ink);
+}
+
+.pixel-btn:hover {
+  transform: translate(-1px, -1px);
+  box-shadow: 4px 4px 0 0 var(--ink);
+}
+
+.pixel-btn:active {
+  transform: translate(2px, 2px);
+  box-shadow: 1px 1px 0 0 var(--ink);
+}
+
+.pixel-btn-secondary {
+  box-shadow: 3px 3px 0 0 var(--line-strong);
+}
+
+.pixel-btn-secondary:hover {
+  border-color: var(--ink);
+  box-shadow: 4px 4px 0 0 var(--ink);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pixel-btn,
+  .pixel-btn:hover,
+  .pixel-btn:active {
+    transform: none;
+    transition: background-color 120ms ease, color 120ms ease, border-color 120ms ease;
+  }
+}
+
+.bg-pixel-dots {
+  background-image: radial-gradient(var(--line-strong) 1px, transparent 1px);
+  background-size: 16px 16px;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html.js-enabled .reveal-item {
+    opacity: 0;
+    transform: translate3d(0, 14px, 0);
+    transition:
+      opacity 480ms cubic-bezier(0.22, 1, 0.36, 1),
+      transform 480ms cubic-bezier(0.22, 1, 0.36, 1);
+    transition-delay: var(--reveal-delay, 0ms);
+  }
+
+  html.js-enabled .reveal-item[data-revealed="true"] {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@media print {
+  .reveal-item {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
+
+/* Custom element `<ascii-logo>` container and WebGL canvas */
+ascii-logo {
+  position: relative;
+  display: block;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  color: var(--ink);
+  accent-color: var(--accent);
+  cursor: grab;
+  user-select: none;
+  touch-action: pan-y;
+}
+
+ascii-logo.is-grabbing {
+  cursor: grabbing;
+}
+
+ascii-logo canvas[data-logo-canvas] {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  font-family: var(--font-mono);
+  font-weight: 500;
+  opacity: 1;
+  transition: opacity 280ms ease;
+}
+
+ascii-logo canvas[data-logo-canvas].is-hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Full-width 3D ASCII `<ascii-quang>` container */
+ascii-quang {
+  display: block;
+  width: 100%;
+  height: 100%;
+  color: #00f0ff;
+  accent-color: #00ff88;
+  user-select: none;
+  touch-action: pan-y;
+}
+
+ascii-quang canvas[data-quang-canvas] {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  font-family: var(--font-plex-mono), ui-monospace, monospace;
+  font-weight: 600;
+  filter: drop-shadow(0 0 14px rgba(0, 240, 255, 0.42))
+    drop-shadow(0 0 28px rgba(0, 255, 136, 0.2));
+  opacity: 1;
+  transition: opacity 320ms ease;
+}
+
+ascii-quang canvas[data-quang-canvas].is-hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ascii-logo canvas[data-logo-canvas],
+  ascii-quang canvas[data-quang-canvas] {
+    transition: none;
+  }
+}
+
+@keyframes pixel-pulse {
+  0%, 76%, 100% {
+    opacity: 1;
+  }
+  82%, 92% {
+    opacity: 0.25;
+  }
+}
+
+.animate-pixel-pulse {
+  animation: pixel-pulse 5.5s steps(2, end) infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-pixel-pulse {
+    animation: none;
+  }
 }

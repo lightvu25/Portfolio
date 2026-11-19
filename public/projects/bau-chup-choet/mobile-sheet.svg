@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 780" fill="none">
+  <rect width="1200" height="780" fill="#ECE8DF"/>
+  <text x="96" y="76" fill="#141413" font-family="monospace" font-size="13" letter-spacing="1.5">03 // MOBILE-FIRST GALLERY &amp; THUMB-FRIENDLY BOOKING</text>
+  <rect x="928" y="58" width="176" height="24" fill="#FFFBEB" stroke="#F29D18"/>
+  <text x="944" y="74" fill="#92400E" font-family="monospace" font-size="11">PLACEHOLDER PREVIEW</text>
+
+  <!-- Phone 1: Feed -->
+  <rect x="176" y="120" width="256" height="560" rx="20" fill="#FAF9F6" stroke="#141413" stroke-width="2"/>
+  <rect x="268" y="138" width="72" height="8" rx="4" fill="#DCD7CC"/>
+  <text x="204" y="186" fill="#141413" font-family="sans-serif" font-size="18" font-weight="700">Bấu Chụp Choẹt</text>
+  <rect x="204" y="208" width="200" height="240" fill="#E6E2D8" stroke="#141413"/>
+  <rect x="204" y="464" width="94" height="120" fill="#DFE3F5" stroke="#141413"/>
+  <rect x="310" y="464" width="94" height="120" fill="#F2EFE8" stroke="#141413"/>
+  <rect x="204" y="612" width="200" height="44" fill="#2B3AE8"/>
+  <text x="248" y="639" fill="#FFFFFF" font-family="monospace" font-size="12" font-weight="700">BOOK A SHOOT</text>
+
+  <!-- Phone 2: Quick Book Sheet -->
+  <rect x="472" y="120" width="256" height="560" rx="20" fill="#FAF9F6" stroke="#141413" stroke-width="2"/>
+  <rect x="474" y="122" width="252" height="148" rx="18" fill="#E6E2D8"/>
+  <rect x="474" y="244" width="252" height="434" rx="16" fill="#FAF9F6" stroke="#141413" stroke-width="1.5"/>
+  <rect x="576" y="260" width="48" height="4" fill="#BEB8AA"/>
+  <text x="500" y="300" fill="#141413" font-family="sans-serif" font-size="16" font-weight="700">Request Session</text>
+  <rect x="500" y="322" width="200" height="40" fill="#F6F4EF" stroke="#BEB8AA"/>
+  <text x="514" y="347" fill="#57544E" font-family="monospace" font-size="11">Portrait / Outdoor</text>
+  <rect x="500" y="376" width="200" height="40" fill="#F6F4EF" stroke="#BEB8AA"/>
+  <text x="514" y="401" fill="#57544E" font-family="monospace" font-size="11">Preferred weekend</text>
+  <rect x="500" y="430" width="200" height="84" fill="#F6F4EF" stroke="#BEB8AA"/>
+  <text x="514" y="458" fill="#75716A" font-family="monospace" font-size="11">Your name &amp; phone/email</text>
+  <rect x="500" y="536" width="200" height="44" fill="#141413"/>
+  <text x="542" y="563" fill="#FAF9F6" font-family="monospace" font-size="12">SEND REQUEST</text>
+
+  <!-- Phone 3: Confirmation -->
+  <rect x="768" y="120" width="256" height="560" rx="20" fill="#FAF9F6" stroke="#141413" stroke-width="2"/>
+  <rect x="860" y="138" width="72" height="8" rx="4" fill="#DCD7CC"/>
+  <rect x="868" y="256" width="56" height="56" fill="#ECFDF3" stroke="#166534" stroke-width="2"/>
+  <path d="M884 284l10 10 18-20" stroke="#166534" stroke-width="3"/>
+  <text x="812" y="352" fill="#141413" font-family="sans-serif" font-size="17" font-weight="700">Inquiry Received</text>
+  <text x="802" y="384" fill="#57544E" font-family="sans-serif" font-size="13">Concept &amp; prep checklist</text>
+  <text x="812" y="404" fill="#57544E" font-family="sans-serif" font-size="13">ready while confirming</text>
+  <text x="844" y="424" fill="#57544E" font-family="sans-serif" font-size="13">your date.</text>
+  <rect x="804" y="476" width="184" height="40" fill="#F6F4EF" stroke="#141413"/>
+  <text x="830" y="501" fill="#141413" font-family="monospace" font-size="11">BACK TO GALLERY</text>
+</svg>

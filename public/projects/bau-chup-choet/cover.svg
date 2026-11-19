@@ -1,0 +1,76 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800" fill="none">
+  <rect width="1200" height="800" fill="#ECE8DF"/>
+  <!-- Subtle pixel dot matrix corner -->
+  <g fill="#BEB8AA">
+    <rect x="44" y="44" width="6" height="6"/><rect x="60" y="44" width="6" height="6"/><rect x="76" y="44" width="6" height="6"/>
+    <rect x="44" y="60" width="6" height="6"/><rect x="60" y="60" width="6" height="6"/>
+    <rect x="44" y="76" width="6" height="6"/>
+    <rect x="1150" y="750" width="6" height="6"/><rect x="1134" y="750" width="6" height="6"/><rect x="1150" y="734" width="6" height="6"/>
+  </g>
+
+  <!-- Browser / Portfolio Frame -->
+  <rect x="96" y="72" width="1008" height="656" fill="#FAF9F6" stroke="#141413" stroke-width="2"/>
+  <line x1="96" y1="124" x2="1104" y2="124" stroke="#DCD7CC" stroke-width="2"/>
+  <rect x="124" y="92" width="12" height="12" fill="#141413"/>
+  <rect x="146" y="92" width="12" height="12" fill="#DCD7CC"/>
+  <rect x="168" y="92" width="12" height="12" fill="#F29D18"/>
+  <text x="204" y="103" fill="#57544E" font-family="monospace" font-size="13" letter-spacing="1.5">BAU CHUP CHOET — PORTFOLIO &amp; BOOKING</text>
+  <rect x="912" y="86" width="164" height="26" fill="#E6E8FC"/>
+  <text x="930" y="103" fill="#2B3AE8" font-family="monospace" font-size="11" letter-spacing="1">SCHEMATIC PREVIEW</text>
+
+  <!-- Left column: Editorial Headline + Quick Booking CTA -->
+  <text x="148" y="204" fill="#2B3AE8" font-family="monospace" font-size="13" letter-spacing="2">[ 01 / PHOTOGRAPHY STUDIO ]</text>
+  <text x="148" y="264" fill="#141413" font-family="sans-serif" font-weight="700" font-size="46">Bấu Chụp Choẹt</text>
+  <text x="148" y="308" fill="#57544E" font-family="sans-serif" font-size="20">Natural portrait series &amp; effortless</text>
+  <text x="148" y="336" fill="#57544E" font-family="sans-serif" font-size="20">online session booking.</text>
+
+  <!-- Concept Chips -->
+  <rect x="148" y="376" width="108" height="32" fill="#141413"/>
+  <text x="168" y="397" fill="#FAF9F6" font-family="monospace" font-size="12">PORTRAIT</text>
+  <rect x="268" y="376" width="104" height="32" fill="#F6F4EF" stroke="#DCD7CC"/>
+  <text x="288" y="397" fill="#57544E" font-family="monospace" font-size="12">COUPLE</text>
+  <rect x="384" y="376" width="116" height="32" fill="#F6F4EF" stroke="#DCD7CC"/>
+  <text x="404" y="397" fill="#57544E" font-family="monospace" font-size="12">LIFESTYLE</text>
+
+  <!-- Booking Card Preview -->
+  <rect x="148" y="444" width="380" height="224" fill="#F6F4EF" stroke="#141413" stroke-width="1.5"/>
+  <text x="176" y="482" fill="#141413" font-family="monospace" font-size="13" font-weight="700">BOOK A SHOOT SESSION</text>
+  <rect x="176" y="502" width="154" height="40" fill="#FAF9F6" stroke="#BEB8AA"/>
+  <text x="192" y="527" fill="#57544E" font-family="monospace" font-size="12">Concept: Outdoor</text>
+  <rect x="344" y="502" width="156" height="40" fill="#FAF9F6" stroke="#BEB8AA"/>
+  <text x="360" y="527" fill="#57544E" font-family="monospace" font-size="12">Date: Sat / AM</text>
+  <rect x="176" y="560" width="324" height="40" fill="#FAF9F6" stroke="#BEB8AA"/>
+  <text x="192" y="585" fill="#75716A" font-family="monospace" font-size="12">Location &amp; mood notes...</text>
+  <rect x="176" y="614" width="184" height="36" fill="#2B3AE8"/>
+  <text x="198" y="637" fill="#FFFFFF" font-family="monospace" font-size="12" font-weight="700">REQUEST SESSION -&gt;</text>
+
+  <!-- Right column: Viewfinder Photo Frames -->
+  <rect x="580" y="172" width="244" height="320" fill="#E6E2D8" stroke="#141413" stroke-width="1.5"/>
+  <!-- Viewfinder corners -->
+  <path d="M596 196v-10h10M808 196v-10h-10M596 468v10h10M808 468v10h-10" stroke="#141413" stroke-width="2"/>
+  <circle cx="702" cy="304" r="46" fill="#D5CFC2"/>
+  <path d="M636 436c16-42 42-62 66-62s50 20 66 62" fill="#C4BDB0"/>
+  <text x="600" y="480" fill="#57544E" font-family="monospace" font-size="11">SERIES 01 // GOLDEN HOUR</text>
+
+  <rect x="844" y="172" width="212" height="204" fill="#DFE3F5" stroke="#141413" stroke-width="1.5"/>
+  <rect x="868" y="196" width="24" height="24" fill="#2B3AE8"/>
+  <rect x="896" y="224" width="16" height="16" fill="#F29D18"/>
+  <text x="864" y="352" fill="#141413" font-family="monospace" font-size="11">LOOKBOOK GRID</text>
+
+  <rect x="844" y="396" width="212" height="272" fill="#F2EFE8" stroke="#141413" stroke-width="1.5"/>
+  <line x1="868" y1="436" x2="1032" y2="436" stroke="#DCD7CC" stroke-width="2"/>
+  <text x="868" y="424" fill="#141413" font-family="monospace" font-size="11">AVAILABLE SLOTS</text>
+  <rect x="868" y="456" width="44" height="34" fill="#FAF9F6" stroke="#BEB8AA"/>
+  <rect x="924" y="456" width="44" height="34" fill="#2B3AE8"/>
+  <rect x="980" y="456" width="44" height="34" fill="#FAF9F6" stroke="#BEB8AA"/>
+  <rect x="868" y="502" width="44" height="34" fill="#FAF9F6" stroke="#BEB8AA"/>
+  <rect x="924" y="502" width="44" height="34" fill="#FAF9F6" stroke="#BEB8AA"/>
+  <rect x="980" y="502" width="44" height="34" fill="#E6E8FC" stroke="#2B3AE8"/>
+  <text x="868" y="576" fill="#57544E" font-family="monospace" font-size="11">INSTANT CONFIRMATION</text>
+  <text x="868" y="596" fill="#75716A" font-family="monospace" font-size="11">CLEAR SHOOT PREP GUIDE</text>
+
+  <!-- Bottom gallery strip -->
+  <rect x="580" y="512" width="244" height="156" fill="#F6F4EF" stroke="#BEB8AA" stroke-dasharray="6 6"/>
+  <text x="612" y="586" fill="#57544E" font-family="monospace" font-size="12">+ CURATED ALBUMS</text>
+  <text x="612" y="608" fill="#75716A" font-family="monospace" font-size="11">Aspect-locked frames</text>
+</svg>

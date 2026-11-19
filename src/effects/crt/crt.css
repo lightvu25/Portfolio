@@ -1,0 +1,97 @@
+/* ──────────────────────────────────────────────────────────────────────────
+   Modular CRT Screen Effect (Halftone + Chromatic Aberration + Fisheye Lens)
+   All overlay layers are strictly `pointer-events: none` so clicks, drags,
+   video controls, and magnetic scroll remain 100% responsive.
+   ────────────────────────────────────────────────────────────────────────── */
+
+.crt-stage-wrapper {
+  position: relative;
+  width: 100%;
+  min-height: 100dvh;
+}
+
+/* Chromatic Aberration subtle RGB phosphor split on titles & borders when active */
+[data-crt-enabled="true"][data-crt-ca="true"] .crt-ca-target,
+[data-crt-enabled="true"][data-crt-ca="true"] h1,
+[data-crt-enabled="true"][data-crt-ca="true"] h2 {
+  text-shadow:
+    calc(-1.25px * var(--crt-intensity, 0.72)) 0 0 rgba(255, 42, 133, 0.42),
+    calc(1.25px * var(--crt-intensity, 0.72)) 0 0 rgba(0, 240, 255, 0.44);
+}
+
+/* Halftone + Phosphor Scanlines mix */
+.crt-layer-halftone {
+  background-image:
+    radial-gradient(rgba(0, 0, 0, 0.42) 1px, transparent 1px),
+    linear-gradient(
+      to bottom,
+      rgba(255, 255, 255, 0) 50%,
+      rgba(0, 0, 0, 0.28) 50%
+    );
+  background-size: 4px 4px, 100% 3px;
+  mix-blend-mode: multiply;
+}
+
+/* Chromatic Aberration edge RGB phosphor grille */
+.crt-layer-ca {
+  background:
+    radial-gradient(
+      ellipse at center,
+      transparent 58%,
+      rgba(255, 46, 147, 0.08) 84%,
+      rgba(0, 229, 255, 0.12) 100%
+    );
+  box-shadow:
+    inset calc(3px * var(--crt-intensity, 0.72)) 0 10px rgba(255, 46, 147, 0.16),
+    inset calc(-3px * var(--crt-intensity, 0.72)) 0 10px rgba(0, 240, 255, 0.18);
+}
+
+/* Subtle Fisheye CRT curved monitor vignette + corner barrel curvature */
+.crt-layer-fisheye {
+  background: radial-gradient(
+    circle at 50% 50%,
+    rgba(255, 255, 255, 0.025) 0%,
+    transparent 56%,
+    rgba(2, 4, 8, 0.42) 86%,
+    rgba(1, 2, 5, 0.88) 100%
+  );
+  box-shadow:
+    inset 0 0 64px rgba(0, 0, 0, 0.75),
+    inset 0 0 0 2px rgba(140, 180, 255, 0.08);
+  border-radius: 18px / 14px;
+}
+
+/* Gentle CRT barrel highlight & bezel curve handled cleanly by fixed overlay
+   so scrollable content `offsetTop` and fixed layers stay 100% deterministic. */
+.crt-fisheye-lens {
+  position: relative;
+}
+
+/* Subtle animated phosphor sweep line */
+@keyframes crt-beam-sweep {
+  0% {
+    transform: translateY(-10vh);
+  }
+  100% {
+    transform: translateY(110vh);
+  }
+}
+
+.crt-scan-beam {
+  background: linear-gradient(
+    to bottom,
+    transparent,
+    rgba(0, 240, 255, 0.06),
+    transparent
+  );
+  animation: crt-beam-sweep 7.5s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .crt-scan-beam {
+    display: none;
+  }
+  [data-crt-enabled="true"][data-crt-fisheye="true"] .crt-fisheye-lens {
+    transform: none;
+  }
+}

@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" shape-rendering="crispEdges">
+  <rect width="128" height="128" fill="#070B13"/>
+  <!-- Neon pixel grid bg -->
+  <g fill="#0E1B2D">
+    <rect x="8" y="8" width="8" height="8"/><rect x="24" y="8" width="8" height="8"/><rect x="40" y="8" width="8" height="8"/>
+    <rect x="80" y="8" width="8" height="8"/><rect x="96" y="8" width="8" height="8"/><rect x="112" y="8" width="8" height="8"/>
+    <rect x="8" y="24" width="8" height="8"/><rect x="112" y="24" width="8" height="8"/>
+    <rect x="8" y="112" width="8" height="8"/><rect x="112" y="112" width="8" height="8"/>
+  </g>
+  <!-- Stylized Game Dev Pixel Portrait (replace with your real photo in src/content/profile.ts) -->
+  <!-- Shoulders / Jacket -->
+  <rect x="24" y="88" width="80" height="40" fill="#101E36"/>
+  <rect x="24" y="88" width="80" height="4" fill="#00F0FF"/>
+  <rect x="44" y="88" width="40" height="40" fill="#0B1322"/>
+  <rect x="60" y="96" width="8" height="32" fill="#00FF88"/>
+  <!-- Neck -->
+  <rect x="52" y="72" width="24" height="20" fill="#D99B78"/>
+  <rect x="52" y="72" width="24" height="6" fill="#B87A58"/>
+  <!-- Face -->
+  <rect x="40" y="32" width="48" height="44" fill="#F0B592"/>
+  <rect x="40" y="32" width="4" height="40" fill="#D99B78"/>
+  <!-- Hair -->
+  <rect x="36" y="20" width="56" height="16" fill="#121826"/>
+  <rect x="36" y="32" width="8" height="16" fill="#121826"/>
+  <rect x="84" y="32" width="8" height="16" fill="#121826"/>
+  <rect x="44" y="16" width="40" height="8" fill="#1A2438"/>
+  <rect x="48" y="28" width="12" height="4" fill="#00F0FF"/>
+  <!-- Neon Cyber Glasses -->
+  <rect x="40" y="46" width="20" height="10" fill="#06121E"/>
+  <rect x="68" y="46" width="20" height="10" fill="#06121E"/>
+  <rect x="60" y="48" width="8" height="4" fill="#00F0FF"/>
+  <rect x="42" y="48" width="16" height="6" fill="#00F0FF" opacity="0.85"/>
+  <rect x="70" y="48" width="16" height="6" fill="#00F0FF" opacity="0.85"/>
+  <rect x="44" y="48" width="4" height="4" fill="#FFFFFF"/>
+  <rect x="72" y="48" width="4" height="4" fill="#FFFFFF"/>
+  <!-- Mouth -->
+  <rect x="56" y="64" width="16" height="4" fill="#9E5B42"/>
+  <!-- Headphones -->
+  <rect x="30" y="38" width="8" height="26" fill="#1F2E4D"/>
+  <rect x="90" y="38" width="8" height="26" fill="#1F2E4D"/>
+  <rect x="30" y="42" width="4" height="18" fill="#00FF88"/>
+  <rect x="94" y="42" width="4" height="18" fill="#00FF88"/>
+  <rect x="36" y="12" width="56" height="6" fill="#1F2E4D"/>
+  <!-- Corner sparkles -->
+  <rect x="16" y="16" width="4" height="4" fill="#00FF88"/>
+  <rect x="108" y="20" width="4" height="4" fill="#FFB800"/>
+</svg>
