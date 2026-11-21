@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 import { gameProjects } from "@/content/games";
 import { BootSequence } from "./BootSequence";
@@ -40,6 +40,14 @@ export function GamePortfolioApp() {
     setWebglState(state);
   }, []);
 
+  useEffect(() => {
+    const html = document.documentElement;
+    html.classList.add("no-root-scrollbar");
+    return () => {
+      html.classList.remove("no-root-scrollbar");
+    };
+  }, []);
+
   return (
     <MagneticScrollProvider sections={SECTIONS}>
       <PixelCursor />
@@ -55,6 +63,7 @@ export function GamePortfolioApp() {
             game={game}
             stageIndex={idx + 1}
             totalGames={gameProjects.length}
+            mediaOnLeft={idx % 2 === 1}
           />
         ))}
         <GameOutroFooter stageIndex={gameProjects.length + 1} />

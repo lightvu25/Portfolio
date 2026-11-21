@@ -7,6 +7,7 @@ import { PixelBadge } from "@pxlkit/ui-kit/data-display";
 import { useEffect, useRef, useState } from "react";
 
 import type { GameProject } from "@/content/games";
+import { GitHubAssetIcon } from "./AssetLinkIcons";
 import { useMagneticScroll } from "./MagneticScroller";
 
 function PixelBullet({ color }: { color: string }) {
@@ -31,10 +32,12 @@ export function GameProjectStage({
   game,
   stageIndex,
   totalGames,
+  mediaOnLeft = stageIndex % 2 === 0,
 }: {
   game: GameProject;
   stageIndex: number;
   totalGames: number;
+  mediaOnLeft?: boolean;
 }) {
   const { activeIndex } = useMagneticScroll();
   const isActive = activeIndex === stageIndex;
@@ -81,7 +84,7 @@ export function GameProjectStage({
           "--game-accent": game.theme.accentHex,
         } as React.CSSProperties
       }
-      className="relative z-10 flex min-h-[100dvh] w-full flex-col justify-between px-4 py-6 sm:px-8 sm:py-8 lg:h-[100dvh] lg:px-12 lg:py-9"
+      className="relative z-10 flex min-h-[100dvh] w-full flex-col justify-between px-4 py-6 sm:px-8 sm:py-8 lg:h-[100dvh] lg:py-9 lg:pl-12 lg:pr-20 xl:pl-16 xl:pr-24"
     >
       {/* Top Status Bar (padded right on desktop/mobile so [CRT: ON/OFF] never collides) */}
       <div className="mx-auto w-full max-w-[1440px]">
@@ -107,8 +110,13 @@ export function GameProjectStage({
 
       {/* Main Two-Column Showcase (Left: Title + Pixel-bullet Description + CTAs | Right: Video Demo + Thumbs) */}
       <div className="mx-auto my-auto grid w-full max-w-[1440px] items-center gap-6 py-4 lg:grid-cols-12 lg:gap-10">
-        {/* LEFT COLUMN: Title, Badges, Long Scrollable Bullet Description, Buttons */}
-        <div className="flex min-h-0 flex-col justify-between space-y-4 lg:col-span-5 lg:max-h-[76dvh]">
+        {/* INFO COLUMN: Title, Badges, Long Scrollable Bullet Description, Buttons */}
+        <div
+          data-stage-info
+          className={`flex min-h-0 flex-col justify-between space-y-4 lg:col-span-5 lg:max-h-[76dvh] ${
+            mediaOnLeft ? "lg:order-2" : "lg:order-1"
+          }`}
+        >
           <div className="space-y-3">
             <div className="flex flex-wrap items-center gap-2">
               <PixelBadge tone={game.theme.pxlTone} size="sm">
@@ -140,7 +148,7 @@ export function GameProjectStage({
           <div
             data-inner-scroll
             tabIndex={0}
-            aria-label={`Chi tiết tính năng của ${game.title}`}
+            aria-label={`${game.title} feature breakdown`}
             className="pixel-scrollbar max-h-[34dvh] space-y-3 overflow-y-auto border-l-2 bg-[#04060A]/65 py-2 pr-3 pl-4 backdrop-blur-xs lg:max-h-[42dvh]"
             style={{ borderColor: `${game.theme.accentHex}88` }}
           >
@@ -178,14 +186,21 @@ export function GameProjectStage({
                 rel="noopener noreferrer"
               >
                 <span>{game.sourceLabel}</span>
-                <PxlKitIcon icon={ExternalLink} size={13} />
+                <span aria-hidden="true" className="inline-flex">
+                  <GitHubAssetIcon size={14} />
+                </span>
               </a>
             </PixelButton>
           </div>
         </div>
 
-        {/* RIGHT COLUMN: Gameplay Video Monitor + Bottom Thumbnail Strip */}
-        <div className="flex flex-col gap-3 lg:col-span-7">
+        {/* MEDIA COLUMN: Gameplay Video Monitor + Bottom Thumbnail Strip */}
+        <div
+          data-stage-media
+          className={`flex flex-col gap-3 lg:col-span-7 ${
+            mediaOnLeft ? "lg:order-1" : "lg:order-2"
+          }`}
+        >
           <div
             ref={mediaContainerRef}
             className="pxl-corner-md relative overflow-hidden border-2 bg-[#030509]"
@@ -216,7 +231,7 @@ export function GameProjectStage({
                 <button
                   type="button"
                   onClick={handleFullscreen}
-                  aria-label="Phóng to toàn màn hình"
+                  aria-label="Toggle fullscreen"
                   className="border border-white/25 bg-[#04060A] px-2 py-0.5 tracking-wider text-white hover:border-white"
                 >
                   FULLSCREEN
@@ -259,7 +274,7 @@ export function GameProjectStage({
           {/* Bottom Thumbnail Strip (matches reference image) */}
           <div
             role="group"
-            aria-label={`Chọn video hoặc ảnh gameplay của ${game.title}`}
+            aria-label={`Select gameplay video or screenshot for ${game.title}`}
             className="flex items-center gap-2.5 overflow-x-auto pb-1"
           >
             {game.media.map((item, idx) => {

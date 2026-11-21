@@ -1,13 +1,17 @@
 "use client";
 
-import { AnimatedPxlKitIcon, PxlKitIcon } from "@pxlkit/core";
+import { AnimatedPxlKitIcon } from "@pxlkit/core";
 import { GlowPulse, SparkBurst } from "@pxlkit/effects";
-import { Copy } from "@pxlkit/ui";
 import { PixelButton } from "@pxlkit/ui-kit/actions";
 import { useToast } from "@pxlkit/ui-kit/toast";
 import { useState } from "react";
 
 import { gameProfile } from "@/content/profile";
+import {
+  EmailAssetIcon,
+  GitHubAssetIcon,
+  ZaloAssetIcon,
+} from "./AssetLinkIcons";
 import { FluidPixelBackdrop } from "./FluidPixelBackdrop";
 import { useMagneticScroll } from "./MagneticScroller";
 
@@ -22,12 +26,12 @@ export function GameOutroFooter({ stageIndex }: { stageIndex: number }) {
       setCopied(kind);
       window.setTimeout(() => setCopied(null), 1800);
       toast.success(
-        kind === "email" ? "Đã copy Email!" : "Đã copy số Zalo!",
+        kind === "email" ? "Email copied!" : "Zalo number copied!",
         value
       );
     } catch {
       toast.info(
-        kind === "email" ? "Email liên hệ:" : "Zalo liên hệ:",
+        kind === "email" ? "Contact Email:" : "Contact Zalo:",
         value
       );
     }
@@ -46,7 +50,7 @@ export function GameOutroFooter({ stageIndex }: { stageIndex: number }) {
       <div className="relative z-10 mx-auto flex w-full max-w-[1160px] flex-1 flex-col items-center justify-center px-4 py-12 text-center sm:px-8">
         <div className="mb-4 flex items-center gap-3">
           <AnimatedPxlKitIcon icon={SparkBurst} size={26} fps={8} />
-          <span className="border border-retro-cyan/40 bg-retro-surface/80 px-3 py-1 font-mono text-xs tracking-[0.22em] text-retro-cyan uppercase">
+          <span className="border border-retro-cyan/40 px-3 py-1 font-mono text-xs tracking-[0.22em] text-retro-cyan uppercase">
             END OF REEL // STAGE CLEAR
           </span>
           <AnimatedPxlKitIcon icon={GlowPulse} size={26} fps={6} />
@@ -56,13 +60,13 @@ export function GameOutroFooter({ stageIndex }: { stageIndex: number }) {
           THANK YOU FOR WATCHING
         </p>
 
-        <div className="mt-8 flex flex-col items-center gap-4 border-2 border-retro-border-strong bg-[#070B13]/85 px-6 py-6 backdrop-blur-sm sm:px-10 sm:py-8">
-          <h2 className="font-display text-3xl font-bold tracking-wider text-[#00FF88] drop-shadow-[0_0_14px_rgba(0,255,136,0.45)] sm:text-5xl">
+        <div className="mt-7 flex flex-col items-center gap-4">
+          <h2 className="font-sans text-3xl font-bold tracking-wide text-[#00FF88] drop-shadow-[0_0_14px_rgba(0,255,136,0.45)] sm:text-5xl">
             Hire Me
           </h2>
-          <p className="max-w-md text-xs leading-relaxed text-retro-muted sm:text-sm">
-            Sẵn sàng hợp tác phát triển game 2D/3D, hệ thống gameplay, shader
-            hoặc các dự án tương tác thời gian thực.
+          <p className="max-w-md text-xs leading-relaxed text-[#B6C9E8] sm:text-sm">
+            Open to collaborations on 2D/3D games, gameplay systems, custom
+            shaders, and real-time interactive projects.
           </p>
 
           <div className="mt-1 flex flex-wrap items-center justify-center gap-3.5">
@@ -73,12 +77,12 @@ export function GameOutroFooter({ stageIndex }: { stageIndex: number }) {
               size="lg"
               iconLeft={
                 <span aria-hidden="true" className="inline-flex">
-                  <PxlKitIcon icon={Copy} size={16} />
+                  <EmailAssetIcon size={16} />
                 </span>
               }
               onClick={() => void handleCopy("email", gameProfile.emailValue)}
             >
-              {copied === "email" ? "Email Copied!" : "Copy Email"}
+              {copied === "email" ? "Email Copied!" : "Email"}
             </PixelButton>
 
             <PixelButton
@@ -88,12 +92,12 @@ export function GameOutroFooter({ stageIndex }: { stageIndex: number }) {
               size="lg"
               iconLeft={
                 <span aria-hidden="true" className="inline-flex">
-                  <PxlKitIcon icon={Copy} size={16} />
+                  <ZaloAssetIcon size={16} />
                 </span>
               }
               onClick={() => void handleCopy("zalo", gameProfile.zaloValue)}
             >
-              {copied === "zalo" ? "Zalo Copied!" : "Copy Zalo"}
+              {copied === "zalo" ? "Zalo Copied!" : "Zalo"}
             </PixelButton>
           </div>
         </div>
@@ -115,7 +119,7 @@ export function GameOutroFooter({ stageIndex }: { stageIndex: number }) {
             </div>
 
             <nav
-              aria-label="Điều hướng phần trang"
+              aria-label="Section navigation"
               className="flex flex-wrap items-center gap-2"
             >
               {sections.map((sec) => (
@@ -141,9 +145,10 @@ export function GameOutroFooter({ stageIndex }: { stageIndex: number }) {
                 href={gameProfile.githubUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-retro-cyan underline underline-offset-4 hover:text-white"
+                className="inline-flex items-center gap-1.5 text-retro-cyan underline underline-offset-4 hover:text-white"
               >
-                GitHub
+                <GitHubAssetIcon size={14} />
+                <span>GitHub</span>
               </a>
             </div>
           </div>

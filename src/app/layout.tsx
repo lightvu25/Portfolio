@@ -71,7 +71,7 @@ export default function RootLayout({
 }>) {
   return (
     <html
-      lang="vi"
+      lang="en"
       className={`${handjetFont.variable} ${pixelifySansFont.variable} ${headingFont.variable} ${bodyFont.variable} ${monoFont.variable} ${pixelFont.variable}`}
     >
       <body className="min-h-screen antialiased">{children}</body>

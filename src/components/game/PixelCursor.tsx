@@ -1,6 +1,5 @@
 "use client";
 
-import gsap from "gsap";
 import { useEffect, useRef, useState } from "react";
 
 import { useFinePointer, useReducedMotionPref } from "@/components/motion/hooks";
@@ -19,9 +18,9 @@ const MAX_PARTICLES = 42;
 
 /**
  * Custom glowing pixel pointer + stepped particle trail on pointer movement.
- * Driven via `gsap.quickTo()` for zero-overhead 60fps tracking, automatically
- * disabled on touch/coarse devices and under `prefers-reduced-motion`, and
- * stops the canvas `rAF` loop completely when the mouse is idle.
+ * Uses direct 1:1 `translate3d` positioning (zero tween lag or edge drift),
+ * hides immediately when the pointer leaves the viewport/window, and stops
+ * the canvas `rAF` loop completely when idle.
  */
 export function PixelCursor() {
   const finePointer = useFinePointer();
@@ -47,9 +46,6 @@ export function PixelCursor() {
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    const xTo = gsap.quickTo(cursorEl, "x", { duration: 0.08, ease: "power3" });
-    const yTo = gsap.quickTo(cursorEl, "y", { duration: 0.08, ease: "power3" });
-
     let width = window.innerWidth;
     let height = window.innerHeight;
     let dpr = Math.min(window.devicePixelRatio || 1, 2);
@@ -70,6 +66,8 @@ export function PixelCursor() {
     let lastSpawnX = -999;
     let lastSpawnY = -999;
     let colorIdx = 0;
+    let isVisible = false;
+    let isHoveringInteractive = false;
 
     const tick = (now: number) => {
       if (particles.length === 0) {
@@ -116,19 +114,59 @@ export function PixelCursor() {
       }
     };
 
+    const syncCursorPosition = (x: number, y: number) => {
+      cursorEl.style.transform = `translate3d(${x}px, ${y}px, 0)`;
+    };
+
+    const hideCursor = () => {
+      if (isVisible) {
+        isVisible = false;
+        setVisible(false);
+      }
+      if (isHoveringInteractive) {
+        isHoveringInteractive = false;
+        setHoverInteractive(false);
+      }
+      lastSpawnX = -999;
+      lastSpawnY = -999;
+    };
+
     const onPointerMove = (e: PointerEvent) => {
       if (e.pointerType === "touch") return;
-      setVisible(true);
-      xTo(e.clientX);
-      yTo(e.clientY);
+
+      const outOfBounds =
+        e.clientX < 0 ||
+        e.clientY < 0 ||
+        e.clientX > window.innerWidth ||
+        e.clientY > window.innerHeight;
+      if (outOfBounds) {
+        hideCursor();
+        return;
+      }
+
+      syncCursorPosition(e.clientX, e.clientY);
+
+      if (!isVisible) {
+        isVisible = true;
+        setVisible(true);
+      }
 
       const target = e.target as HTMLElement | null;
-      const isInteractive = Boolean(
+      const nextInteractive = Boolean(
         target?.closest(
           'a, button, [role="button"], video, input, select, textarea, ascii-quang'
         )
       );
-      setHoverInteractive(isInteractive);
+      if (nextInteractive !== isHoveringInteractive) {
+        isHoveringInteractive = nextInteractive;
+        setHoverInteractive(nextInteractive);
+      }
+
+      if (lastSpawnX < -500) {
+        lastSpawnX = e.clientX;
+        lastSpawnY = e.clientY;
+        return;
+      }
 
       const dist = Math.hypot(e.clientX - lastSpawnX, e.clientY - lastSpawnY);
       if (dist >= 14) {
@@ -143,7 +181,7 @@ export function PixelCursor() {
         particles.push({
           x: e.clientX + (colorIdx % 2 === 0 ? 4 : -6),
           y: e.clientY + (colorIdx % 3 === 0 ? 6 : -4),
-          size: isInteractive ? 8 : 6,
+          size: nextInteractive ? 8 : 6,
           life: 360,
           maxLife: 360,
           color: TRAIL_COLORS[colorIdx],
@@ -152,20 +190,34 @@ export function PixelCursor() {
       }
     };
 
-    const onPointerLeave = () => {
-      setVisible(false);
+    const onWindowMouseOut = (e: MouseEvent) => {
+      if (!e.relatedTarget) {
+        hideCursor();
+      }
+    };
+
+    const onVisibilityChange = () => {
+      if (document.hidden) {
+        hideCursor();
+      }
     };
 
     window.addEventListener("resize", resize);
     window.addEventListener("pointermove", onPointerMove, { passive: true });
-    document.addEventListener("mouseleave", onPointerLeave);
+    window.addEventListener("mouseout", onWindowMouseOut);
+    window.addEventListener("blur", hideCursor);
+    document.documentElement.addEventListener("mouseleave", hideCursor);
+    document.addEventListener("visibilitychange", onVisibilityChange);
 
     return () => {
       document.documentElement.classList.remove("pixel-cursor-active");
       if (rafId !== 0) cancelAnimationFrame(rafId);
       window.removeEventListener("resize", resize);
       window.removeEventListener("pointermove", onPointerMove);
-      document.removeEventListener("mouseleave", onPointerLeave);
+      window.removeEventListener("mouseout", onWindowMouseOut);
+      window.removeEventListener("blur", hideCursor);
+      document.documentElement.removeEventListener("mouseleave", hideCursor);
+      document.removeEventListener("visibilitychange", onVisibilityChange);
     };
   }, [enabled]);
 
@@ -181,12 +233,12 @@ export function PixelCursor() {
       <div
         ref={cursorRef}
         aria-hidden="true"
-        className={`pointer-events-none fixed top-0 left-0 z-[95] transition-opacity duration-150 ${
+        className={`pointer-events-none fixed top-0 left-0 z-[95] will-change-transform ${
           visible ? "opacity-100" : "opacity-0"
         }`}
         style={{
-          marginLeft: -2,
-          marginTop: -2,
+          marginLeft: hoverInteractive ? -12 : -3,
+          marginTop: hoverInteractive ? -12 : -2,
           filter: hoverInteractive
             ? "drop-shadow(0 0 8px #00FF88)"
             : "drop-shadow(0 0 6px #00F0FF)",

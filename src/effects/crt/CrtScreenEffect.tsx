@@ -99,7 +99,7 @@ export function CrtProvider({
           onClick={toggleCrt}
           aria-pressed={config.enabled}
           aria-label={
-            config.enabled ? "Tắt hiệu ứng CRT" : "Bật hiệu ứng CRT"
+            config.enabled ? "Disable CRT effect" : "Enable CRT effect"
           }
           className="pxl-corner-sm pxl-shadow fixed top-3 right-3 z-[85] inline-flex h-8 items-center gap-1.5 border-2 border-retro-border-strong bg-retro-bg/90 px-2.5 font-mono text-[11px] font-semibold tracking-wider text-retro-text backdrop-blur-sm transition-colors hover:border-retro-cyan hover:text-retro-cyan sm:top-4 sm:right-5"
         >

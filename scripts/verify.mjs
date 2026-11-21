@@ -158,6 +158,28 @@ async function main() {
     await gamePage.waitForSelector('[data-testid="pixel-scan-loader"]', {
       timeout: 3000,
     });
+    await gamePage.waitForTimeout(220);
+
+    const bootAudit = await gamePage.evaluate(() => {
+      const beam = document.querySelector("[data-scan-beam]");
+      const loader = document.querySelector('[data-testid="pixel-scan-loader"]');
+      const beamRect = beam?.getBoundingClientRect();
+      const loaderRect = loader?.getBoundingClientRect();
+      const cx = loaderRect ? loaderRect.left + loaderRect.width / 2 : 0;
+      const cy = loaderRect ? loaderRect.top + loaderRect.height / 2 : 0;
+      return {
+        beamFullWidth: beamRect ? beamRect.width >= window.innerWidth - 4 : false,
+        loaderCentered:
+          Math.abs(cx - window.innerWidth / 2) < 60 &&
+          Math.abs(cy - window.innerHeight / 2) < 60,
+        hasScanCanvas: Boolean(document.querySelector("[data-boot-scan-canvas]")),
+      };
+    });
+    assert(
+      bootAudit.beamFullWidth && bootAudit.hasScanCanvas && bootAudit.loaderCentered,
+      `Expected full-screen pixel scan beam & centered progress bar during boot (${JSON.stringify(bootAudit)})`
+    );
+
     await gamePage.screenshot({
       path: path.join(SCREENSHOT_DIR, "game-boot-loader.png"),
       fullPage: false,
@@ -184,9 +206,57 @@ async function main() {
       const li = document.querySelector('a[aria-label*="LinkedIn"]');
       const gh = document.querySelector('a[aria-label="GitHub profile"]');
       const cv = document.querySelector('a[download]');
+      const avatarImg = document.querySelector("#hero .hero-avatar-box img");
       const gameCount = document.querySelectorAll(
         'section[id^="game-"]'
       ).length;
+      const roleEl = document.querySelector("[data-hero-role]");
+      const nameEl = document.querySelector("[data-hero-name]");
+      const bioRemoved = !document.querySelector("[data-hero-bio]");
+      const heroText = document.getElementById("hero")?.textContent || "";
+      const skillCardsRemoved =
+        !heroText.includes("ENGINE & TECH") &&
+        !heroText.includes("CORE SYSTEMS");
+      const taglineRemoved = !document.querySelector("[data-hero-tagline]");
+      const leftInvader = document.querySelector('[data-role-invader="left"]');
+      const rightInvader = document.querySelector('[data-role-invader="right"]');
+      const roleRect = roleEl?.getBoundingClientRect();
+      const nameRect = nameEl?.getBoundingClientRect();
+      const avatarBoxRect = document
+        .querySelector("#hero .hero-avatar-box")
+        ?.getBoundingClientRect();
+      const leftLinksRect = document
+        .querySelector("[data-hero-links-left]")
+        ?.getBoundingClientRect();
+      const rightLinksRect = document
+        .querySelector("[data-hero-links-right]")
+        ?.getBoundingClientRect();
+      const linksOnAvatarRow = Boolean(
+        avatarBoxRect &&
+          leftLinksRect &&
+          rightLinksRect &&
+          nameRect &&
+          leftLinksRect.top >= avatarBoxRect.top &&
+          leftLinksRect.bottom <= avatarBoxRect.bottom + 16 &&
+          rightLinksRect.top >= avatarBoxRect.top &&
+          rightLinksRect.bottom <= avatarBoxRect.bottom + 16 &&
+          leftLinksRect.bottom <= nameRect.top + 8 &&
+          rightLinksRect.bottom <= nameRect.top + 8
+      );
+      const leftInvRect = leftInvader?.getBoundingClientRect();
+      const rightInvRect = rightInvader?.getBoundingClientRect();
+      const roleBg = roleEl ? getComputedStyle(roleEl).backgroundColor : "";
+      const roleFontPx = roleEl ? parseFloat(getComputedStyle(roleEl).fontSize) : 0;
+      const nameFontPx = nameEl ? parseFloat(getComputedStyle(nameEl).fontSize) : 0;
+      const sparkleCount = document.querySelectorAll("[data-name-sparkle]").length;
+      const hasIntroPixelCanvas = Boolean(
+        document.querySelector("[data-hero-intro-canvas]")
+      );
+      const rootScrollbarWidth = getComputedStyle(
+        document.documentElement
+      ).scrollbarWidth;
+      const nativeScrollbarPx =
+        window.innerWidth - document.documentElement.clientWidth;
       return {
         topNavbarCount,
         crossLinks,
@@ -197,9 +267,91 @@ async function main() {
         liHref: li?.getAttribute("href") || "",
         ghHref: gh?.getAttribute("href") || "",
         hasCvDownload: Boolean(cv),
+        cvHref: cv?.getAttribute("href") || "",
+        cvDownload: cv?.getAttribute("download") || "",
+        avatarLoaded: Boolean(
+          avatarImg && avatarImg.complete && avatarImg.naturalWidth > 0
+        ),
+        avatarNaturalWidth: avatarImg ? avatarImg.naturalWidth : 0,
         gameCount,
+        taglineRemoved,
+        bioRemoved,
+        skillCardsRemoved,
+        nameAboveRole: Boolean(
+          nameRect && roleRect && nameRect.top < roleRect.top
+        ),
+        linksOnAvatarRow,
+        roleBg,
+        roleFontPx,
+        nameFontPx,
+        invadersCount: document.querySelectorAll("[data-role-invader]").length,
+        invadersFlankRole: Boolean(
+          leftInvRect &&
+            rightInvRect &&
+            roleRect &&
+            leftInvRect.left < roleRect.left &&
+            rightInvRect.left >= roleRect.right - 4
+        ),
+        sparkleCount,
+        hasIntroPixelCanvas,
+        rootScrollbarWidth,
+        nativeScrollbarPx,
       };
     });
+
+    assert(
+      heroAudit.taglineRemoved &&
+        heroAudit.bioRemoved &&
+        heroAudit.skillCardsRemoved &&
+        heroAudit.nameAboveRole &&
+        heroAudit.linksOnAvatarRow,
+      `Expected streamlined Hero with 6 buttons aligned on avatar row (taglineRemoved=${heroAudit.taglineRemoved}, bioRemoved=${heroAudit.bioRemoved}, skillCardsRemoved=${heroAudit.skillCardsRemoved}, nameAboveRole=${heroAudit.nameAboveRole}, linksOnAvatarRow=${heroAudit.linksOnAvatarRow})`
+    );
+    assert(
+      heroAudit.invadersCount === 2 && heroAudit.invadersFlankRole,
+      `Expected 2 animated invader icons flanking Role (count=${heroAudit.invadersCount}, flank=${heroAudit.invadersFlankRole})`
+    );
+    assert(
+      heroAudit.roleBg === "rgba(0, 0, 0, 0)",
+      `Expected Role text without background fill, got '${heroAudit.roleBg}'`
+    );
+    assert(
+      heroAudit.roleFontPx >= 22 && heroAudit.roleFontPx < heroAudit.nameFontPx,
+      `Expected font hierarchy role (${heroAudit.roleFontPx}) >= 22px and < name (${heroAudit.nameFontPx})`
+    );
+    assert(
+      heroAudit.sparkleCount >= 3 && heroAudit.hasIntroPixelCanvas,
+      `Expected name sparkle accents (${heroAudit.sparkleCount}) and intro pixel canvas (${heroAudit.hasIntroPixelCanvas})`
+    );
+
+    assert(
+      heroAudit.rootScrollbarWidth === "none" && heroAudit.nativeScrollbarPx === 0,
+      `Expected hidden root vertical scrollbar on '/' (scrollbarWidth=${heroAudit.rootScrollbarWidth}, nativeScrollbarPx=${heroAudit.nativeScrollbarPx})`
+    );
+    assert(
+      heroAudit.avatarLoaded && heroAudit.avatarNaturalWidth > 0,
+      `Expected Hero avatar image to load cleanly (loaded=${heroAudit.avatarLoaded}, width=${heroAudit.avatarNaturalWidth})`
+    );
+
+    const cvRes = await fetch(`${baseUrl}${heroAudit.cvHref}`);
+    assert(
+      cvRes.status === 200,
+      `Expected CV URL '${heroAudit.cvHref}' to return HTTP 200, got ${cvRes.status}`
+    );
+    const cvContentType = cvRes.headers.get("content-type") || "";
+    assert(
+      cvContentType.toLowerCase().includes("application/pdf"),
+      `Expected CV Content-Type 'application/pdf', got '${cvContentType}'`
+    );
+    const cvHead = Buffer.from((await cvRes.arrayBuffer()).slice(0, 5)).toString("ascii");
+    assert(
+      cvHead === "%PDF-",
+      `Expected CV response body to start with '%PDF-' binary header, got '${cvHead}'`
+    );
+    assert(
+      heroAudit.cvDownload.toLowerCase().endsWith(".pdf"),
+      `Expected CV download filename to end with '.pdf', got '${heroAudit.cvDownload}'`
+    );
 
     assert(
       heroAudit.topNavbarCount === 0,
@@ -231,13 +383,13 @@ async function main() {
       fullPage: false,
     });
 
-    // Click Zalo copy button -> expect PxlKitToast notification
-    await gamePage.getByRole("button", { name: /^zalo$/i }).click();
+    // Click Zalo copy button in Hero -> expect PxlKitToast notification
+    await gamePage.locator("#hero").getByRole("button", { name: /^zalo$/i }).click();
     await gamePage.waitForSelector("[data-pxl-toast]", { timeout: 2500 });
     await gamePage.waitForTimeout(150);
 
     // Test CRT Toggle ON -> OFF -> ON
-    const crtBtn = gamePage.getByRole("button", { name: /hiệu ứng crt/i });
+    const crtBtn = gamePage.getByRole("button", { name: /crt effect/i });
     const crtInitial = await gamePage
       .locator("[data-crt-enabled]")
       .getAttribute("data-crt-enabled");
@@ -248,6 +400,21 @@ async function main() {
       .getAttribute("data-crt-enabled");
     assert(crtOff === "false", `Expected CRT 'false' after toggle click, got '${crtOff}'`);
     await crtBtn.click();
+
+    // Check English-only text audit (excluding "Vũ Minh Quang")
+    const nonEnglishLeak = await gamePage.evaluate(() => {
+      const stripped = document.body.innerText.replace(/Vũ Minh Quang/g, "");
+      const m = stripped.match(
+        /[àáạảãâầấậẩẫăằắặẳẵèéẹẻẽêềếệểễìíịỉĩòóọỏõôồốộổỗơờớợởỡùúụủũưừứựửữỳýỵỷỹđ]/i
+      );
+      if (!m || m.index === undefined) return "";
+      const start = Math.max(0, m.index - 20);
+      return stripped.slice(start, start + 60);
+    });
+    assert(
+      !nonEnglishLeak,
+      `Expected only English copy (except Vũ Minh Quang) on '/', found: '${nonEnglishLeak}'`
+    );
 
     // Test Magnetic Scroll + 0.5s Cooldown: two rapid wheel events 120ms apart should advance strictly 1 stage (0 -> 1)
     await gamePage.mouse.move(720, 450);
@@ -297,16 +464,44 @@ async function main() {
       fullPage: false,
     });
 
+    // Verify alternating desktop layout: 1 & 3 (info left, media right) vs 2 & 4 (media left, info right)
+    const alternatingAudit = await gamePage.evaluate(() => {
+      return ["game-01", "game-02", "game-03", "game-04"].map((id) => {
+        const sec = document.getElementById(id);
+        const info = sec?.querySelector("[data-stage-info]")?.getBoundingClientRect();
+        const media = sec?.querySelector("[data-stage-media]")?.getBoundingClientRect();
+        return {
+          id,
+          infoLeft: info ? Math.round(info.left) : -1,
+          mediaLeft: media ? Math.round(media.left) : -1,
+        };
+      });
+    });
+    for (let i = 0; i < alternatingAudit.length; i++) {
+      const row = alternatingAudit[i];
+      if (i % 2 === 0) {
+        assert(
+          row.infoLeft >= 0 && row.infoLeft < row.mediaLeft,
+          `Expected ${row.id} info on left and media on right (info=${row.infoLeft}, media=${row.mediaLeft})`
+        );
+      } else {
+        assert(
+          row.mediaLeft >= 0 && row.mediaLeft < row.infoLeft,
+          `Expected ${row.id} media on left and info on right (media=${row.mediaLeft}, info=${row.infoLeft})`
+        );
+      }
+    }
+
     // Jump to Outro/Footer stage & verify THANK YOU FOR WATCHING, Hire Me, 2-tier Footer
-    await gamePage.getByRole("button", { name: "Chuyển đến HIRE" }).click();
+    await gamePage.getByRole("button", { name: "Jump to HIRE" }).click();
     await gamePage.waitForTimeout(700);
     const outroChecks = await gamePage.evaluate(() => {
       const txt = document.getElementById("outro")?.textContent || "";
       return {
         hasThankYou: txt.includes("THANK YOU FOR WATCHING"),
         hasHireMe: txt.includes("Hire Me"),
-        hasCopyEmail: txt.includes("Copy Email"),
-        hasCopyZalo: txt.includes("Copy Zalo"),
+        hasEmailBtn: txt.includes("Email"),
+        hasZaloBtn: txt.includes("Zalo"),
         hasName: txt.includes("Vũ Minh Quang"),
         hasCopyright: txt.includes("© 2026"),
       };

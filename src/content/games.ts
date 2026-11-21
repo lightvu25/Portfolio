@@ -3,7 +3,6 @@ import type { Tone } from "@pxlkit/ui-kit/common";
 export interface GameMediaItem {
   id: string;
   type: "video" | "image";
-  /** Put `.mp4` / `.webm` in `public/games/game-0X/` when ready; poster renders seamlessly until video loads. */
   src: string;
   poster: string;
   label: string;
@@ -31,7 +30,6 @@ export interface GameProject {
   role: string;
   theme: GameTheme;
   summary: string;
-  /** Detailed bullet list rendered with glowing pixel bullets (supports long scrollable descriptions). */
   features: string[];
   liveUrl: string;
   liveLabel: string;
@@ -48,12 +46,12 @@ export const gameProjects: GameProject[] = [
   {
     id: "game-01",
     index: "01",
-    title: "NEON CHRONICLE // PROJECT 01",
-    subtitle: "Action Roguelite · Top-Down Pixel Combat",
-    genre: "Action Roguelite",
+    title: "GRAVITA",
+    subtitle: "Grid-Based Movement gameplay",
+    genre: "Hybrid Action Puzzle",
     engine: "Unity · C#",
     year: "2026 [Placeholder]",
-    role: "Lead Gameplay & Systems Programmer",
+    role: "Dev",
     theme: {
       bgBase: "#030A07",
       pixelIdle: "#071C13",
@@ -64,18 +62,18 @@ export const gameProjects: GameProject[] = [
       pxlTone: "green",
     },
     summary:
-      "[Mô tả tổng quan Project 01 — Thay nội dung giới thiệu gameplay, cốt truyện hoặc bài toán kỹ thuật chính của tựa game đầu tiên tại `src/content/games.ts`.]",
+      "[Project 01 Overview — Replace with gameplay introduction, core gravity/grid puzzle loop, or key technical highlights in `src/content/games.ts`.]",
     features: [
-      "Hệ thống Combat phản hồi nhanh: kết hợp Input Buffering, Coyote Time, Hit-stop theo frame và Camera Shake có kiểm soát để từng đòn đánh có lực.",
-      "AI Enemy State Machine mô-đun hoá (Patrol, Telegraph, Dash Attack, Stagger) cho phép nhà thiết kế ghép hành vi boss mới qua ScriptableObject mà không sửa code lõi.",
-      "Sinh bản đồ ngẫu nhiên theo Room Graph (Procedural Dungeon) với thuật toán kiểm tra đường đi thông suốt trước khi spawn quái và hòm thưởng.",
-      "Object Pooling toàn diện cho đạn, hạt pixel VFX và số sát thương (Damage Popups), giữ frame time ổn định ngay cả khi hàng trăm thực thể xuất hiện cùng lúc.",
-      "Shader 2D Pixel Lighting & Dissolve viết bằng HLSL giúp nhân vật và kỹ năng phát sáng neon sắc nét trên nền tối.",
-      "Hệ thống Inventory & Upgrade Tree lưu trạng thái bằng JSON checksum an toàn, hỗ trợ chơi tiếp và đổi cấu hình phím điều khiển.",
+      "Snappy combat and grid-based response: combines Input Buffering, Coyote Time, frame-accurate hit-stop, and tuned screen shake for impactful actions.",
+      "Modular AI Enemy State Machine (Patrol, Telegraph, Dash Attack, Stagger) allowing designers to compose new boss behaviors via ScriptableObjects without touching core code.",
+      "Procedural Room-Graph generation with path-connectivity validation before spawning enemies, traps, and reward chests.",
+      "Comprehensive Object Pooling for projectiles, pixel VFX particles, and damage popups to keep frame times stable even with hundreds of active entities.",
+      "Custom HLSL 2D pixel lighting & dissolve shaders making characters and abilities glow crisply against dark environments.",
+      "JSON checksum-verified Inventory & Upgrade Tree state saving supporting seamless run continuation and key rebinding.",
     ],
-    liveUrl: "https://github.com/your-github-username",
-    liveLabel: "Play / Live Demo",
-    sourceUrl: "https://github.com/your-github-username",
+    liveUrl: "https://github.com/lightvu25/Gravita",
+    liveLabel: "Play",
+    sourceUrl: "https://github.com/lightvu25/Gravita",
     sourceLabel: "GitHub",
     media: [
       {
@@ -84,7 +82,7 @@ export const gameProjects: GameProject[] = [
         src: "",
         poster: "/games/game-01/demo-1.svg",
         label: "Combat Boss",
-        caption: "Clip 01 — Gameplay chiến đấu & Hit-stop VFX (thêm .mp4 vào public/games/game-01/)",
+        caption: "Clip 01 — Combat gameplay & hit-stop VFX (drop .mp4 into public/games/game-01/)",
       },
       {
         id: "g1-clip-2",
@@ -92,7 +90,7 @@ export const gameProjects: GameProject[] = [
         src: "",
         poster: "/games/game-01/demo-2.svg",
         label: "Dungeon Gen",
-        caption: "Clip 02 — Thuật toán tạo phòng ngẫu nhiên & Minimap",
+        caption: "Clip 02 — Procedural room generation & minimap traversal",
       },
       {
         id: "g1-shot-3",
@@ -100,15 +98,15 @@ export const gameProjects: GameProject[] = [
         src: "/games/game-01/demo-3.svg",
         poster: "/games/game-01/demo-3.svg",
         label: "Skill Tree",
-        caption: "Screenshot 03 — Giao diện nâng cấp & Pixel HUD",
+        caption: "Screenshot 03 — Upgrade interface & Pixel HUD",
       },
     ],
   },
   {
     id: "game-02",
     index: "02",
-    title: "CYBER DRIFT // PROJECT 02",
-    subtitle: "High-Speed Arcade Platformer · Precision Movement",
+    title: "EK",
+    subtitle: "Action Roguelite",
     genre: "Precision Platformer",
     engine: "Godot / Custom Physics",
     year: "2026 [Placeholder]",
@@ -123,14 +121,14 @@ export const gameProjects: GameProject[] = [
       pxlTone: "cyan",
     },
     summary:
-      "[Mô tả tổng quan Project 02 — Giới thiệu cơ chế di chuyển, giải đố hoặc thử thách tốc độ mà bạn tự hào nhất trong dự án game thứ hai.]",
+      "[Project 02 Overview — Highlight the custom movement mechanics, speedrun tuning, or technical systems in your second game project.]",
     features: [
-      "Bộ điều khiển nhân vật 2D tuỳ biến hoàn toàn (Custom Kinematic Controller) với gia tốc phi tuyến, bám tường, wall-jump và cơ chế dash 8 hướng.",
-      "Hệ thống Ghost Replay ghi lại quỹ đạo từng frame của người chơi để đua bóng (Time Trial) với độ lệch bằng 0.",
-      "Cơ chế tương tác môi trường phản ứng theo tốc độ: bệ nhảy đàn hồi, cổng dịch chuyển bảo toàn vector vận tốc và bẫy laser đồng bộ nhịp.",
-      "Tích hợp Custom Level Data & Hot-reload màn chơi phục vụ tinh chỉnh nhịp độ thử thách nhanh chóng.",
-      "Hiệu ứng hậu ảnh (Afterimage Trail) & vệt sáng Cyan vẽ bằng GPU Particle giữ rõ đường bay ở tốc độ cao.",
-      "Hỗ trợ đầy đủ cả bàn phím lẫn tay cầm Gamepad với rung phản hồi (Haptic Feedback) tinh chỉnh theo va chạm.",
+      "Fully custom 2D Kinematic Character Controller featuring non-linear acceleration curves, wall clinging, wall-jumping, and 8-directional air dashing.",
+      "Frame-exact Ghost Replay system recording player trajectories for zero-drift Time Trial racing.",
+      "Velocity-reactive environment hazards: elastic bounce pads, momentum-preserving portals, and beat-synchronized laser gates.",
+      "Custom level data pipeline & hot-reload support enabling rapid difficulty pacing and obstacle iteration.",
+      "GPU particle afterimage trails and cyan speed ribbons keeping high-velocity movement silhouettes readable.",
+      "Full keyboard and gamepad input support with impact-tuned haptic rumble feedback.",
     ],
     liveUrl: "https://github.com/your-github-username",
     liveLabel: "Play / Live Demo",
@@ -143,7 +141,7 @@ export const gameProjects: GameProject[] = [
         src: "",
         poster: "/games/game-02/demo-1.svg",
         label: "Speedrun",
-        caption: "Clip 01 — Chuỗi Wall-Jump & Dash tốc độ cao",
+        caption: "Clip 01 — High-speed Wall-Jump & Dash chains",
       },
       {
         id: "g2-clip-2",
@@ -151,7 +149,7 @@ export const gameProjects: GameProject[] = [
         src: "",
         poster: "/games/game-02/demo-2.svg",
         label: "Ghost Race",
-        caption: "Clip 02 — Hệ thống Replay bóng thời gian thực",
+        caption: "Clip 02 — Real-time Ghost Replay race system",
       },
       {
         id: "g2-shot-3",
@@ -159,14 +157,14 @@ export const gameProjects: GameProject[] = [
         src: "/games/game-02/demo-3.svg",
         poster: "/games/game-02/demo-3.svg",
         label: "Level Editor",
-        caption: "Screenshot 03 — Bố cục màn chơi & bẫy đồng bộ nhịp",
+        caption: "Screenshot 03 — Level layout & rhythm-synced hazards",
       },
     ],
   },
   {
     id: "game-03",
     index: "03",
-    title: "SYNTH PULSE // PROJECT 03",
+    title: "Echoes",
     subtitle: "Rhythm Bullet-Hell · Audio-Reactive Shaders",
     genre: "Rhythm / Bullet-Hell",
     engine: "Unity · Shader Graph / HLSL",
@@ -182,14 +180,14 @@ export const gameProjects: GameProject[] = [
       pxlTone: "pink",
     },
     summary:
-      "[Mô tả tổng quan Project 03 — Trình bày cách đồng bộ âm thanh, đạn màn và hiệu ứng synthwave neon pixel trong dự án thứ ba.]",
+      "[Project 03 Overview — Describe the audio synchronization, bullet-hell emitter architecture, and neon synthwave shaders in this project.]",
     features: [
-      "Hệ thống Beat-Sync Clock sử dụng DSP Time chuẩn xác, triệt tiêu hoàn toàn độ trễ trôi nhịp giữa nhạc nền và đợt bắn của Boss.",
-      "Bullet Pattern Emitter dạng Data-driven: tạo vòng xoắn ốc, sóng sin, tia laser cảnh báo với hàng nghìn viên đạn xử lý qua GPU Instancing / Job System.",
-      "Audio-Reactive Visuals: phân tích phổ tần số (FFT Spectrum) để điều khiển biên độ rung sàn đấu, ánh sáng neon và hiệu ứng biến dạng không gian.",
-      "Công cụ Beatmap Timeline tích hợp trong Editor giúp đánh dấu nhịp trực tiếp trên sóng âm và xem trước tức thì.",
-      "Hệ thống chấm điểm Combo & Rank theo cửa sổ thời gian (Perfect / Great / Miss) kèm hiệu ứng phản hồi UI sắc nét.",
-      "Tối ưu vùng va chạm (Hitbox Grazing) nhỏ hơn sprite nhân vật giúp người chơi lách đạn sát mép đầy kịch tính.",
+      "Sample-accurate DSP Beat-Sync Clock eliminating audio-visual drift between background tracks and boss attack waves.",
+      "Data-driven Bullet Pattern Emitter generating spirals, sine waves, and warning lasers for thousands of bullets via GPU Instancing & Job System.",
+      "Audio-Reactive Visuals driven by real-time FFT spectrum analysis to modulate arena floor pulses, neon glow, and distortion shaders.",
+      "In-editor Beatmap Timeline tool allowing designers to scrub waveforms, place beat markers, and preview patterns live.",
+      "Timing-window Combo & Rank scoring system (Perfect / Great / Miss) paired with crisp UI punch feedback.",
+      "Precision grazing hitbox tuned tighter than the character sprite for thrilling close-call bullet dodging.",
     ],
     liveUrl: "https://github.com/your-github-username",
     liveLabel: "Play / Live Demo",
@@ -202,7 +200,7 @@ export const gameProjects: GameProject[] = [
         src: "",
         poster: "/games/game-03/demo-1.svg",
         label: "Boss Phase",
-        caption: "Clip 01 — Đạn màn đồng bộ nhịp DSP & Audio-reactive VFX",
+        caption: "Clip 01 — DSP-synced bullet patterns & audio-reactive VFX",
       },
       {
         id: "g3-clip-2",
@@ -210,7 +208,7 @@ export const gameProjects: GameProject[] = [
         src: "",
         poster: "/games/game-03/demo-2.svg",
         label: "Graze Combo",
-        caption: "Clip 02 — Cơ chế lách đạn tính điểm Combo",
+        caption: "Clip 02 — Bullet-grazing combo scoring mechanic",
       },
       {
         id: "g3-shot-3",
@@ -218,14 +216,14 @@ export const gameProjects: GameProject[] = [
         src: "/games/game-03/demo-3.svg",
         poster: "/games/game-03/demo-3.svg",
         label: "Timeline Tool",
-        caption: "Screenshot 03 — Công cụ chỉnh nhịp Beatmap trong Editor",
+        caption: "Screenshot 03 — Custom in-editor Beatmap Timeline tool",
       },
     ],
   },
   {
     id: "game-04",
     index: "04",
-    title: "SOLAR BASTION // PROJECT 04",
+    title: "ADHD Dungeon",
     subtitle: "Tactical Pixel Strategy · Grid & AI Simulation",
     genre: "Tactical Turn-Based",
     engine: "TypeScript / WebGL / Unity",
@@ -241,14 +239,14 @@ export const gameProjects: GameProject[] = [
       pxlTone: "gold",
     },
     summary:
-      "[Mô tả tổng quan Project 04 — Chia sẻ bài toán chiến thuật theo lượt, AI tìm đường A*, mô phỏng tài nguyên hoặc thiết kế giao diện HUD chiến thuật.]",
+      "[Project 04 Overview — Share turn-based combat logic, A* pathfinding, AI decision scoring, or tactical HUD engineering highlights.]",
     features: [
-      "Thuật toán tìm đường A* kết hợp bản đồ trọng số địa hình (Cost Map) và tính toán vùng tầm bắn (Line-of-Sight Raycast trên lưới ô).",
-      "Utility AI cho phe địch biết đánh giá mục tiêu yếu máu, giữ vị trí yểm trợ và phối hợp kỹ năng thay vì lao vào ngẫu nhiên.",
-      "Hệ thống Command Pattern hỗ trợ Hoàn tác (Undo) nước đi chiến thuật và xem trước sát thương dự kiến (Damage Preview) trước khi xác nhận.",
-      "Giao diện Game HUD trực quan: thanh máu phân đốt pixel, biểu đồ trạng thái buff/debuff và nhật ký chiến đấu dễ theo dõi.",
-      "Tách biệt hoàn toàn lõi mô phỏng (Deterministic Simulation) với tầng hiển thị giúp dễ viết unit test và hỗ trợ lưu/nạp trận đấu nhanh.",
-      "Shader sương mù chiến tranh (Fog of War) mượt mà chuyển bậc pixel quanh các đơn vị trinh sát.",
+      "A* pathfinding combined with weighted terrain cost maps and grid-based Line-of-Sight raycasting for tactical firing arcs.",
+      "Utility AI evaluating low-HP targets, cover positioning, and skill synergies instead of naive random aggro.",
+      "Command Pattern turn pipeline enabling instant move Undo and real-time Damage Preview before confirming attacks.",
+      "Readable tactical HUD featuring segmented pixel health bars, status buff/debuff badges, and a clean combat log.",
+      "Strict separation between deterministic simulation state and rendering view for reliable unit testing and save/load snapshots.",
+      "Smooth pixel-stepped Fog of War shader dynamically revealing tiles around scouting units.",
     ],
     liveUrl: "https://github.com/your-github-username",
     liveLabel: "Play / Live Demo",
@@ -261,7 +259,7 @@ export const gameProjects: GameProject[] = [
         src: "",
         poster: "/games/game-04/demo-1.svg",
         label: "Grid Combat",
-        caption: "Clip 01 — Chiến đấu theo lượt trên lưới & Preview sát thương",
+        caption: "Clip 01 — Turn-based grid combat & damage preview",
       },
       {
         id: "g4-clip-2",
@@ -269,7 +267,7 @@ export const gameProjects: GameProject[] = [
         src: "",
         poster: "/games/game-04/demo-2.svg",
         label: "Utility AI",
-        caption: "Clip 02 — Phản ứng phối hợp của Utility AI & Fog of War",
+        caption: "Clip 02 — Coordinated Utility AI & Fog of War visibility",
       },
       {
         id: "g4-shot-3",
@@ -277,7 +275,7 @@ export const gameProjects: GameProject[] = [
         src: "/games/game-04/demo-3.svg",
         poster: "/games/game-04/demo-3.svg",
         label: "Tactical HUD",
-        caption: "Screenshot 03 — Giao diện chỉ huy & thông số đơn vị",
+        caption: "Screenshot 03 — Command interface & unit inspection panel",
       },
     ],
   },

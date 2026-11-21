@@ -3,8 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
-    "build": "next build && node scripts/postbuild-static.mjs",
+    "dev": "node scripts/sync-assets.mjs && next dev --webpack",
+    "dev:turbo": "node scripts/sync-assets.mjs && next dev --turbopack",
+    "build": "node scripts/sync-assets.mjs && next build --webpack && node scripts/postbuild-static.mjs",
     "start": "next start",
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
@@ -23,7 +24,7 @@
     "three": "^0.187.0"
   },
   "devDependencies": {
-    "@tailwindcss/turbopack": "^4",
+    "@tailwindcss/postcss": "^4.3.4",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",

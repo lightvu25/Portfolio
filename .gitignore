@@ -77,3 +77,6 @@ next-env.d.ts
 /asset/components/packages/**/*.examples.tsx
 /asset/components/packages/**/*.manifest.ts
 /asset/fonts/**/static/
+
+# auto-synced static copies generated from asset/avatar & asset/cv before dev/build
+/public/asset/

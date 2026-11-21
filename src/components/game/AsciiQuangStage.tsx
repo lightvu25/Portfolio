@@ -195,7 +195,7 @@ export function AsciiQuangStage({
             role: "img",
             revealed: bootComplete ? "true" : "false",
             "aria-label":
-              "Chữ QUANG 3D bằng ký tự ASCII phát sáng neon — di chuột để nghiêng và làm nổi bật từng chữ cái",
+              "3D neon ASCII QUANG — move pointer to tilt and highlight letters",
             className: "absolute inset-0 h-full w-full",
           },
           createElement("canvas", {
