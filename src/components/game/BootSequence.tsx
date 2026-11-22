@@ -9,26 +9,133 @@ import { gameProfile } from "@/content/profile";
 import { useMagneticScroll } from "./MagneticScroller";
 import { PixelScanLoader } from "./PixelScanLoader";
 
-const ASCII_Q_ROWS = [
-  "  .@@@@@@@@.  ",
-  " @@@      @@@ ",
-  "@@          @@",
-  "@@          @@",
-  "@@    .@@   @@",
-  "@@     @@@  @@",
-  " @@@    @@@@@ ",
-  "  .@@@@@@@@@@ ",
-  "          @@@@",
-];
+interface CurtainBlock {
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+  fill: string;
+  opacity: number;
+}
+
+const NEON_PALETTE = ["#00F0FF", "#00FF88", "#FFB800", "#B86BFF"];
+
+function noiseHash(a: number, b: number, seed: number): number {
+  let n = Math.imul(a + 11, 374761393) + Math.imul(b + 19, 668265263) + Math.imul(seed, 2147483647);
+  n = (n ^ (n >>> 13)) * 1274126177;
+  return ((n ^ (n >>> 16)) >>> 0) / 4294967295;
+}
+
+function buildNoisyCurtainBlocks(seed: number): CurtainBlock[] {
+  const blocks: CurtainBlock[] = [];
+  const cols = 54;
+  const colW = 36;
+
+  for (let c = 0; c < cols; c++) {
+    const h0 = noiseHash(c, 1, seed);
+    const h1 = noiseHash(c, 2, seed);
+    const h2 = noiseHash(c, 3, seed);
+    const h3 = noiseHash(c, 4, seed);
+
+    const depth = h0 < 0.28 ? 1 : h0 < 0.68 ? 2 : 3;
+    const jitterX = Math.round((h1 - 0.5) * 2) * 8;
+    const jitterY = Math.round(h2 * 2) * 6;
+    const colBaseX = c * colW;
+
+    // Solid dark shutter teeth blocks
+    const solidH = depth * 32 + jitterY;
+    blocks.push({
+      x: colBaseX - 2,
+      y: 0,
+      w: colW + 6,
+      h: solidH,
+      fill: "#04060A",
+      opacity: 1,
+    });
+
+    // Edge chunky dark-navy / neon highlight pixel attached near the tooth tip
+    const tipSize = h3 > 0.5 ? 36 : 28;
+    const tipColor =
+      NEON_PALETTE[Math.floor(noiseHash(c, 5, seed) * NEON_PALETTE.length)];
+    if (noiseHash(c, 6, seed) > 0.32) {
+      blocks.push({
+        x: colBaseX + jitterX,
+        y: Math.max(8, solidH - tipSize + (h1 > 0.6 ? 12 : 0)),
+        w: tipSize,
+        h: tipSize,
+        fill: noiseHash(c, 7, seed) > 0.45 ? tipColor : "#091326",
+        opacity: 0.7 + noiseHash(c, 8, seed) * 0.3,
+      });
+    }
+
+    // Detached floating noisy chunky pixels ahead of the split curtain seam
+    if (noiseHash(c, 9, seed) > 0.35) {
+      const floatSize = noiseHash(c, 10, seed) > 0.5 ? 32 : 24;
+      const floatX = colBaseX + Math.round((noiseHash(c, 11, seed) - 0.5) * 4) * 8;
+      const floatY = solidH + 8 + Math.round(noiseHash(c, 12, seed) * 4) * 8;
+      const floatColor =
+        NEON_PALETTE[Math.floor(noiseHash(c, 13, seed) * NEON_PALETTE.length)];
+      if (floatY + floatSize <= 160) {
+        blocks.push({
+          x: floatX,
+          y: floatY,
+          w: floatSize,
+          h: floatSize,
+          fill: floatColor,
+          opacity: 0.55 + noiseHash(c, 14, seed) * 0.45,
+        });
+      }
+    }
+  }
+
+  return blocks;
+}
+
+const TOP_CURTAIN_BLOCKS = buildNoisyCurtainBlocks(17);
+const BOTTOM_CURTAIN_BLOCKS = buildNoisyCurtainBlocks(53);
+
+function PixelCurtainTeeth({ edge }: { edge: "bottom" | "top" }) {
+  const isBottomOfTopCurtain = edge === "bottom";
+  const blocks = isBottomOfTopCurtain
+    ? TOP_CURTAIN_BLOCKS
+    : BOTTOM_CURTAIN_BLOCKS;
+
+  return (
+    <svg
+      data-curtain-teeth=""
+      aria-hidden="true"
+      viewBox="0 0 1920 160"
+      preserveAspectRatio="xMidYMin slice"
+      shapeRendering="crispEdges"
+      className={`pointer-events-none absolute inset-x-0 h-[120px] w-full opacity-0 sm:h-[160px] ${
+        isBottomOfTopCurtain
+          ? "-bottom-[118px] sm:-bottom-[158px]"
+          : "-top-[118px] rotate-180 sm:-top-[158px]"
+      }`}
+    >
+      {blocks.map((b, i) => (
+        <rect
+          key={i}
+          x={b.x}
+          y={b.y}
+          width={b.w}
+          height={b.h}
+          fill={b.fill}
+          fillOpacity={b.opacity}
+        />
+      ))}
+    </svg>
+  );
+}
 
 /**
- * Full-Screen Preloader & Boot Transition:
+ * Full-Screen Preloader & Noisy Chunky Pixel Split-Curtain Transition:
  * 1. Scans & waits for fonts, avatar image, and WebGL2 `QUANG` pre-warm with a
- *    full-viewport pixel scanline + pixel grid sweep while keeping status +
+ *    full-viewport large noisy pixel scanline sweep while keeping status +
  *    progress bar centered.
- * 2. Morphs centered loader into glowing ASCII `Q`.
- * 3. Flies `Q` smoothly into the exact `Q` slot of `QUANG` (Hero top 50%).
- * 4. Reveals `U-A-N-G` + Hero profile & unlocks Magnetic Scroll.
+ * 2. Ignites the center neon pixel seam (`top: 50%`) as loading hits 100%.
+ * 3. Parts the top and bottom chunky noise-pixel shutters symmetrically outward
+ *    to reveal `QUANG` + Hero profile seamlessly & unlocks Magnetic Scroll.
  */
 export function BootSequence({
   webglState,
@@ -39,10 +146,12 @@ export function BootSequence({
   const reducedMotion = useReducedMotionPref();
 
   const overlayRef = useRef<HTMLDivElement | null>(null);
+  const topCurtainRef = useRef<HTMLDivElement | null>(null);
+  const bottomCurtainRef = useRef<HTMLDivElement | null>(null);
+  const seamRef = useRef<HTMLDivElement | null>(null);
   const scanCanvasRef = useRef<HTMLCanvasElement | null>(null);
   const scanBeamRef = useRef<HTMLDivElement | null>(null);
   const loaderWrapRef = useRef<HTMLDivElement | null>(null);
-  const qGlyphRef = useRef<HTMLDivElement | null>(null);
 
   const [progress, setProgress] = useState(12);
   const [statusLabel, setStatusLabel] = useState("SCANNING ASSETS");
@@ -110,7 +219,7 @@ export function BootSequence({
     return () => window.clearTimeout(timer);
   }, [webglState]);
 
-  // Full-viewport pixel scan canvas illuminated along the sweeping full-screen beam
+  // Full-viewport large noisy pixel scan canvas illuminated along the sweeping beam
   useEffect(() => {
     if (hidden || reducedMotion || assetsLoaded) return;
     const canvas = scanCanvasRef.current;
@@ -121,7 +230,7 @@ export function BootSequence({
     let width = window.innerWidth;
     let height = window.innerHeight;
     let dpr = Math.min(window.devicePixelRatio || 1, 2);
-    const cell = 24;
+    const cell = 44;
 
     const resize = () => {
       width = window.innerWidth;
@@ -149,32 +258,42 @@ export function BootSequence({
 
       const cols = Math.ceil(width / cell);
       const rows = Math.ceil(height / cell);
-      const block = cell - 4;
 
       for (let r = 0; r < rows; r++) {
-        const py = r * cell + 2;
-        const distY = Math.abs(py + block * 0.5 - beamY);
-        const beamGlow = distY < 96 ? 1 - distY / 96 : 0;
-
         for (let c = 0; c < cols; c++) {
-          const seed = ((r * 73 + c * 37) % 100) / 100;
+          const hA = noiseHash(c, r, 101);
+          const hB = noiseHash(c, r, 211);
+          const hC = noiseHash(c, r, 307);
+
+          const jx = Math.round((hA - 0.5) * 2) * 8;
+          const jy = Math.round((hB - 0.5) * 2) * 8;
+          const blockSize = hC > 0.65 ? 38 : hC > 0.3 ? 30 : 24;
+
+          const px = c * cell + jx;
+          const py = r * cell + jy;
+          const distY = Math.abs(py + blockSize * 0.5 - beamY);
+          const beamGlow = distY < 115 ? 1 - distY / 115 : 0;
+
           if (beamGlow > 0.05) {
-            if (seed > 0.78 - beamGlow * 0.45) {
+            if (hA > 0.72 - beamGlow * 0.45) {
               const stepped = Math.ceil(beamGlow * 4) / 4;
               ctx.fillStyle =
-                distY < 26
-                  ? `rgba(255, 184, 0, ${(stepped * 0.45).toFixed(2)})`
-                  : seed > 0.55
-                    ? `rgba(0, 255, 136, ${(stepped * 0.34).toFixed(2)})`
-                    : `rgba(0, 240, 255, ${(stepped * 0.34).toFixed(2)})`;
-              ctx.fillRect(c * cell + 2, py, block, block);
+                distY < 32
+                  ? `rgba(255, 184, 0, ${(stepped * 0.48).toFixed(2)})`
+                  : hB > 0.52
+                    ? `rgba(0, 255, 136, ${(stepped * 0.36).toFixed(2)})`
+                    : `rgba(0, 240, 255, ${(stepped * 0.36).toFixed(2)})`;
+              ctx.fillRect(px, py, blockSize, blockSize);
             }
-          } else if (seed < pctRatio * 0.22) {
+          } else if (hB < pctRatio * 0.24) {
             const flicker =
-              Math.sin(elapsed * 5 + r * 0.7 + c * 0.9) * 0.5 + 0.5;
-            if (flicker > 0.6) {
-              ctx.fillStyle = "rgba(0, 240, 255, 0.09)";
-              ctx.fillRect(c * cell + 2, py, block, block);
+              Math.sin(elapsed * 4.5 + hC * 12) * 0.5 + 0.5;
+            if (flicker > 0.58) {
+              ctx.fillStyle =
+                hC > 0.5
+                  ? "rgba(0, 240, 255, 0.1)"
+                  : "rgba(0, 255, 136, 0.08)";
+              ctx.fillRect(px, py, blockSize, blockSize);
             }
           }
         }
@@ -213,15 +332,18 @@ export function BootSequence({
     { scope: overlayRef, dependencies: [reducedMotion, assetsLoaded] }
   );
 
-  // Orchestrated Q -> QUANG reveal timeline when 100% loaded
+  // Orchestrated Top & Bottom Chunky Noisy Pixel Curtain Open reveal when 100% loaded
   useGSAP(
     () => {
       if (!assetsLoaded || bootComplete) return;
 
       const overlay = overlayRef.current;
+      const topCurtain = topCurtainRef.current;
+      const bottomCurtain = bottomCurtainRef.current;
+      const seam = seamRef.current;
       const loaderWrap = loaderWrapRef.current;
-      const qGlyph = qGlyphRef.current;
-      if (!overlay || !loaderWrap || !qGlyph) {
+
+      if (!overlay || !topCurtain || !bottomCurtain || !loaderWrap) {
         setBootComplete(true);
         setHidden(true);
         return;
@@ -240,48 +362,35 @@ export function BootSequence({
         },
       });
 
-      const anchor = document.querySelector<HTMLElement>(
-        "[data-quang-q-anchor]"
-      );
-      const qRect = qGlyph.getBoundingClientRect();
-      const targetRect = anchor?.getBoundingClientRect();
-
-      const dx = targetRect
-        ? targetRect.left +
-          targetRect.width / 2 -
-          (qRect.left + qRect.width / 2)
-        : -220;
-      const dy = targetRect
-        ? targetRect.top +
-          targetRect.height / 2 -
-          (qRect.top + qRect.height / 2)
-        : -180;
-      const targetScale = targetRect
-        ? Math.max(0.75, Math.min(1.55, targetRect.height / Math.max(qRect.height, 60)))
-        : 1.05;
-
-      // 1. Fade out full-screen beam + centered progress HUD into glowing ASCII 'Q'
-      tl.to([loaderWrap, scanBeamRef.current, scanCanvasRef.current], {
-        scale: 0.94,
+      // 1. Fade out scan beam, pixel scan matrix & centered progress bar
+      tl.to([scanBeamRef.current, scanCanvasRef.current], {
         autoAlpha: 0,
-        duration: 0.24,
-        ease: "power2.in",
+        duration: 0.2,
+        ease: "power2.out",
       })
-        .fromTo(
-          qGlyph,
-          { autoAlpha: 0, scale: 0.72 },
-          { autoAlpha: 1, scale: 1, duration: 0.28, ease: "back.out(1.6)" },
-          "-=0.06"
+        .to(
+          loaderWrap,
+          {
+            scale: 0.94,
+            autoAlpha: 0,
+            duration: 0.2,
+            ease: "power2.in",
+          },
+          "<"
         )
-        // 2. Fly ASCII 'Q' smoothly to exact Q position in QUANG
-        .to(qGlyph, {
-          x: dx,
-          y: dy,
-          scale: targetScale,
-          duration: 0.62,
-          ease: "power3.inOut",
-        })
-        // 3. Hand off to pre-warmed QUANG 3D canvas & fade boot overlay out
+        // 2. Ignite horizontal center neon pixel seam & illuminate chunky noisy pixel blocks
+        .to(
+          overlay.querySelectorAll("[data-curtain-teeth]"),
+          { autoAlpha: 1, duration: 0.14, ease: "power1.out" },
+          "-=0.08"
+        )
+        .fromTo(
+          seam,
+          { scaleX: 0, autoAlpha: 0 },
+          { scaleX: 1, autoAlpha: 1, duration: 0.24, ease: "power3.out" },
+          "<"
+        )
+        // 3. Hand off to pre-warmed QUANG 3D canvas as top & bottom chunky pixel shutters part
         .add(() => {
           const quangEl = document.querySelector("ascii-quang") as
             | (HTMLElement & { revealWord?: () => void })
@@ -289,18 +398,31 @@ export function BootSequence({
           quangEl?.setAttribute("revealed", "true");
           quangEl?.revealWord?.();
           setBootComplete(true);
-        }, "-=0.14")
-        .to(qGlyph, {
-          autoAlpha: 0,
-          duration: 0.22,
-          ease: "power2.out",
         })
         .to(
-          overlay,
+          seam,
           {
             autoAlpha: 0,
-            duration: 0.36,
+            duration: 0.18,
             ease: "power2.out",
+          },
+          "<"
+        )
+        .to(
+          topCurtain,
+          {
+            yPercent: -155,
+            duration: 0.78,
+            ease: "power4.inOut",
+          },
+          "<"
+        )
+        .to(
+          bottomCurtain,
+          {
+            yPercent: 155,
+            duration: 0.78,
+            ease: "power4.inOut",
           },
           "<"
         );
@@ -315,35 +437,72 @@ export function BootSequence({
       ref={overlayRef}
       data-testid="boot-sequence-overlay"
       aria-live="polite"
-      className="fixed inset-0 z-[90] flex items-center justify-center overflow-hidden bg-[#04060A]"
+      className="pointer-events-none fixed inset-0 z-[90] flex items-center justify-center overflow-hidden"
     >
-      {/* Full-screen subtle pixel grid */}
+      {/* Top Pixel Split-Curtain Shutter */}
       <div
+        ref={topCurtainRef}
+        data-pixel-curtain="top"
         aria-hidden="true"
-        className="pointer-events-none absolute inset-0 opacity-25"
-        style={{
-          backgroundImage:
-            "linear-gradient(to right, rgba(0, 240, 255, 0.14) 1px, transparent 1px), linear-gradient(to bottom, rgba(0, 240, 255, 0.14) 1px, transparent 1px)",
-          backgroundSize: "24px 24px",
-        }}
+        className="pointer-events-auto absolute inset-x-0 top-0 h-1/2 bg-[#04060A] will-change-transform"
+      >
+        <div
+          className="absolute inset-0 opacity-25"
+          style={{
+            backgroundImage:
+              "linear-gradient(to right, rgba(0, 240, 255, 0.14) 1px, transparent 1px), linear-gradient(to bottom, rgba(0, 240, 255, 0.14) 1px, transparent 1px)",
+            backgroundSize: "36px 36px",
+          }}
+        />
+        <div
+          className="absolute inset-0 opacity-45"
+          style={{
+            backgroundImage:
+              "repeating-linear-gradient(to bottom, rgba(255,255,255,0.05) 0px, rgba(255,255,255,0.05) 2px, transparent 2px, transparent 5px)",
+          }}
+        />
+        <PixelCurtainTeeth edge="bottom" />
+      </div>
+
+      {/* Bottom Pixel Split-Curtain Shutter */}
+      <div
+        ref={bottomCurtainRef}
+        data-pixel-curtain="bottom"
+        aria-hidden="true"
+        className="pointer-events-auto absolute inset-x-0 bottom-0 h-1/2 bg-[#04060A] will-change-transform"
+      >
+        <div
+          className="absolute inset-0 opacity-25"
+          style={{
+            backgroundImage:
+              "linear-gradient(to right, rgba(0, 240, 255, 0.14) 1px, transparent 1px), linear-gradient(to bottom, rgba(0, 240, 255, 0.14) 1px, transparent 1px)",
+            backgroundSize: "36px 36px",
+          }}
+        />
+        <div
+          className="absolute inset-0 opacity-45"
+          style={{
+            backgroundImage:
+              "repeating-linear-gradient(to bottom, rgba(255,255,255,0.05) 0px, rgba(255,255,255,0.05) 2px, transparent 2px, transparent 5px)",
+          }}
+        />
+        <PixelCurtainTeeth edge="top" />
+      </div>
+
+      {/* Center Ignition Horizon Seam before shutters split open */}
+      <div
+        ref={seamRef}
+        data-pixel-seam=""
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-x-0 top-1/2 z-[15] h-[2px] -translate-y-1/2 bg-[#00F0FF] opacity-0 shadow-[0_0_18px_#00F0FF,0_0_36px_#00FF88]"
       />
 
-      {/* Full-screen horizontal CRT scanlines */}
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-0 opacity-45"
-        style={{
-          backgroundImage:
-            "repeating-linear-gradient(to bottom, rgba(255,255,255,0.05) 0px, rgba(255,255,255,0.05) 2px, transparent 2px, transparent 5px)",
-        }}
-      />
-
-      {/* Full-screen dynamic pixel scan matrix */}
+      {/* Full-screen dynamic large noisy pixel scan matrix */}
       <canvas
         ref={scanCanvasRef}
         data-boot-scan-canvas=""
         aria-hidden="true"
-        className="pointer-events-none absolute inset-0 h-full w-full"
+        className="pointer-events-none absolute inset-0 z-[4] h-full w-full"
       />
 
       {/* Full-width full-screen sweeping pixel scan beam */}
@@ -366,19 +525,6 @@ export function BootSequence({
       {/* Centered scan status + pixel progress bar */}
       <div ref={loaderWrapRef} className="relative z-10">
         <PixelScanLoader progress={progress} statusLabel={statusLabel} />
-      </div>
-
-      {/* Morph target: ASCII 'Q' that glides into QUANG */}
-      <div
-        ref={qGlyphRef}
-        aria-hidden="true"
-        className="pointer-events-none absolute z-20 flex flex-col items-center opacity-0"
-      >
-        <div className="border border-[#00F0FF]/50 bg-[#04060A]/80 px-4 py-3 shadow-[0_0_24px_rgba(0,240,255,0.45)]">
-          <pre className="font-mono text-xs leading-[1.08] font-bold text-[#00F0FF] drop-shadow-[0_0_10px_rgba(0,240,255,0.85)] sm:text-base">
-            {ASCII_Q_ROWS.join("\n")}
-          </pre>
-        </div>
       </div>
     </div>
   );

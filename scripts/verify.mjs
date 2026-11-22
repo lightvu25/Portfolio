@@ -158,11 +158,13 @@ async function main() {
     await gamePage.waitForSelector('[data-testid="pixel-scan-loader"]', {
       timeout: 3000,
     });
-    await gamePage.waitForTimeout(220);
+    await gamePage.waitForTimeout(80);
 
     const bootAudit = await gamePage.evaluate(() => {
       const beam = document.querySelector("[data-scan-beam]");
       const loader = document.querySelector('[data-testid="pixel-scan-loader"]');
+      const topCurtain = document.querySelector('[data-pixel-curtain="top"]');
+      const bottomCurtain = document.querySelector('[data-pixel-curtain="bottom"]');
       const beamRect = beam?.getBoundingClientRect();
       const loaderRect = loader?.getBoundingClientRect();
       const cx = loaderRect ? loaderRect.left + loaderRect.width / 2 : 0;
@@ -173,11 +175,15 @@ async function main() {
           Math.abs(cx - window.innerWidth / 2) < 60 &&
           Math.abs(cy - window.innerHeight / 2) < 60,
         hasScanCanvas: Boolean(document.querySelector("[data-boot-scan-canvas]")),
+        hasSplitCurtains: Boolean(topCurtain && bottomCurtain),
       };
     });
     assert(
-      bootAudit.beamFullWidth && bootAudit.hasScanCanvas && bootAudit.loaderCentered,
-      `Expected full-screen pixel scan beam & centered progress bar during boot (${JSON.stringify(bootAudit)})`
+      bootAudit.beamFullWidth &&
+        bootAudit.hasScanCanvas &&
+        bootAudit.loaderCentered &&
+        bootAudit.hasSplitCurtains,
+      `Expected full-screen pixel scan beam, centered progress bar & dual pixel curtains during boot (${JSON.stringify(bootAudit)})`
     );
 
     await gamePage.screenshot({
@@ -524,7 +530,7 @@ async function main() {
       `Uncaught page errors on '/': ${gamePageErrors.join(" | ")}`
     );
     notes.push(
-      `Game Portfolio '/': Boot->Q->QUANG (WebGL2=${heroAudit.quangReady}), 4 Game stages, 0.5s Magnetic Scroll cooldown, CRT toggle, and 2-tier Fluid Footer verified.`
+      `Game Portfolio '/': Boot->SplitCurtain->QUANG (WebGL2=${heroAudit.quangReady}), 4 Game stages, 0.5s Magnetic Scroll cooldown, CRT toggle, and 2-tier Fluid Footer verified.`
     );
     await gameContext.close();
 

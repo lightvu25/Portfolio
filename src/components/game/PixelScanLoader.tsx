@@ -1,8 +1,5 @@
 "use client";
 
-import { AnimatedPxlKitIcon } from "@pxlkit/core";
-import { ScanSweep } from "@pxlkit/effects";
-
 interface PixelScanLoaderProps {
   progress: number;
   statusLabel: string;
@@ -19,15 +16,8 @@ export function PixelScanLoader({
   return (
     <div
       data-testid="pixel-scan-loader"
-      className="flex flex-col items-center gap-3 select-none"
+      className="flex flex-col items-center select-none"
     >
-      <div
-        aria-hidden="true"
-        className="drop-shadow-[0_0_12px_rgba(0,240,255,0.6)]"
-      >
-        <AnimatedPxlKitIcon icon={ScanSweep} size={28} fps={10} />
-      </div>
-
       {/* Pixel Progress Meter + Status */}
       <div className="flex w-60 flex-col items-center gap-2 sm:w-72">
         <div className="flex w-full items-center justify-between font-mono text-xs tracking-widest text-retro-text">

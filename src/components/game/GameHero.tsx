@@ -97,7 +97,7 @@ export function GameHero({
       <div className="relative z-20 flex flex-1 flex-col justify-between bg-[#060911]/95 px-3.5 pt-0 pb-3 sm:px-6 sm:pb-4 lg:px-10 lg:pb-5">
         <HeroIntroPixelBackdrop />
 
-        <div className="relative z-20 mx-auto grid w-full max-w-[1380px] flex-1 grid-cols-1 content-evenly gap-3 sm:gap-4 lg:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] lg:grid-rows-[auto_1fr] lg:items-center lg:gap-x-8 lg:gap-y-3">
+        <div className="relative z-20 mx-auto grid w-full max-w-[1380px] flex-1 grid-cols-1 content-evenly gap-3 sm:gap-4 lg:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] lg:grid-rows-[auto_1fr] lg:items-center lg:gap-x-8 lg:gap-y-2">
           {/* 1. Centered Pixel-Bordered Avatar straddling the 50% horizon line (Row 1, Center) */}
           <div
             className="hero-avatar-stage relative z-30 order-1 flex flex-col items-center lg:col-start-2 lg:row-start-1"
@@ -263,8 +263,8 @@ export function GameHero({
             </div>
           </div>
 
-          {/* 4. Centered Name & Role Stack on its own row below the Avatar + Buttons row */}
-          <div className="order-2 flex flex-col items-center justify-center space-y-2 text-center sm:space-y-3 lg:col-span-3 lg:row-start-2">
+          {/* 4. Centered Name & Role Stack tucked close beneath the Avatar + Buttons row */}
+          <div className="order-2 flex flex-col items-center justify-center space-y-2 text-center sm:space-y-2.5 lg:col-span-3 lg:row-start-2 lg:self-start lg:pt-2">
             <SparkleNameHeading fullName={gameProfile.fullName} />
 
             <RoleWithInvaders role={gameProfile.role} />

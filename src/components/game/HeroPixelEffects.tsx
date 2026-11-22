@@ -175,7 +175,7 @@ export function SparkleNameHeading({ fullName }: { fullName: string }) {
 
       <h1
         data-hero-name=""
-        className="hero-name-sparkle font-display text-3xl leading-[1.02] font-bold tracking-wide text-[#ECF4FF] sm:text-5xl lg:text-[3.35rem] xl:text-[3.75rem]"
+        className="hero-name-sparkle font-display text-4xl leading-[1.02] font-bold tracking-wide text-[#ECF4FF] sm:text-6xl lg:text-[4.25rem] xl:text-[4.75rem]"
       >
         {fullName}
       </h1>
