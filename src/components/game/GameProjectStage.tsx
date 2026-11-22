@@ -113,7 +113,7 @@ export function GameProjectStage({
         {/* INFO COLUMN: Title, Badges, Long Scrollable Bullet Description, Buttons */}
         <div
           data-stage-info
-          className={`flex min-h-0 flex-col justify-between space-y-4 lg:col-span-5 lg:max-h-[76dvh] ${
+          className={`flex min-h-0 min-w-0 flex-col justify-between space-y-4 lg:col-span-5 lg:max-h-[76dvh] ${
             mediaOnLeft ? "lg:order-2" : "lg:order-1"
           }`}
         >
@@ -125,6 +125,11 @@ export function GameProjectStage({
               <PixelBadge tone="neutral" size="sm">
                 {game.engine}
               </PixelBadge>
+              {game.teamInfo && (
+                <PixelBadge tone="neutral" size="sm">
+                  {game.teamInfo}
+                </PixelBadge>
+              )}
             </div>
 
             <h2
@@ -157,12 +162,27 @@ export function GameProjectStage({
             </p>
 
             <ul className="space-y-2.5 pt-1 text-xs leading-relaxed text-[#BACCE8] sm:text-sm">
-              {game.features.map((feat, fIdx) => (
-                <li key={fIdx} className="flex items-start gap-2.5">
-                  <PixelBullet color={game.theme.accentHex} />
-                  <span>{feat}</span>
-                </li>
-              ))}
+              {game.features.map((feat, fIdx) => {
+                const colonIdx = feat.indexOf(":");
+                const hasLead = colonIdx > 0 && colonIdx <= 36;
+                return (
+                  <li key={fIdx} className="flex items-start gap-2.5">
+                    <PixelBullet color={game.theme.accentHex} />
+                    <span>
+                      {hasLead ? (
+                        <>
+                          <strong className="font-semibold text-white">
+                            {feat.slice(0, colonIdx + 1)}
+                          </strong>
+                          {feat.slice(colonIdx + 1)}
+                        </>
+                      ) : (
+                        feat
+                      )}
+                    </span>
+                  </li>
+                );
+              })}
             </ul>
           </div>
 
@@ -197,7 +217,7 @@ export function GameProjectStage({
         {/* MEDIA COLUMN: Gameplay Video Monitor + Bottom Thumbnail Strip */}
         <div
           data-stage-media
-          className={`flex flex-col gap-3 lg:col-span-7 ${
+          className={`flex min-w-0 flex-col gap-3 lg:col-span-7 ${
             mediaOnLeft ? "lg:order-1" : "lg:order-2"
           }`}
         >
@@ -285,7 +305,7 @@ export function GameProjectStage({
                   type="button"
                   onClick={() => setMediaIdx(idx)}
                   aria-pressed={selected}
-                  className="group relative flex w-24 shrink-0 flex-col overflow-hidden border-2 bg-[#060910] text-left transition-transform hover:-translate-y-0.5 sm:w-28"
+                  className="group relative flex w-28 shrink-0 flex-col overflow-hidden border-2 bg-[#060910] text-left transition-transform hover:-translate-y-0.5 sm:w-40"
                   style={{
                     borderColor: selected
                       ? game.theme.accentHex

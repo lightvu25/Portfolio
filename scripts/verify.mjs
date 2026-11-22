@@ -459,7 +459,7 @@ async function main() {
     // Click thumbnail #2 in Game 02
     const g2Thumb2 = gamePage
       .locator("#game-02")
-      .getByRole("button", { name: /ghost race/i });
+      .getByRole("button", { name: /echoes & relics/i });
     await g2Thumb2.click();
     assert(
       (await g2Thumb2.getAttribute("aria-pressed")) === "true",
@@ -469,6 +469,17 @@ async function main() {
       path: path.join(SCREENSHOT_DIR, "game-project-02-1440.png"),
       fullPage: false,
     });
+
+    const gameTitles = await gamePage.evaluate(() =>
+      ["game-01", "game-02", "game-03", "game-04"].map(
+        (id) => document.querySelector(`#${id} h2`)?.textContent?.trim() || ""
+      )
+    );
+    const expectedTitles = ["GRAVITA", "ECHOES", "ETERNAL KING", "ADHD DUNGEON"];
+    assert(
+      JSON.stringify(gameTitles) === JSON.stringify(expectedTitles),
+      `Expected game headings ${JSON.stringify(expectedTitles)}, got ${JSON.stringify(gameTitles)}`
+    );
 
     // Verify alternating desktop layout: 1 & 3 (info left, media right) vs 2 & 4 (media left, info right)
     const alternatingAudit = await gamePage.evaluate(() => {

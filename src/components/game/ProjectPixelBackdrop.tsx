@@ -13,6 +13,27 @@ function hexToRgb(hex: string): [number, number, number] {
   return [(num >> 16) & 255, (num >> 8) & 255, num & 255];
 }
 
+function paletteFromTheme(theme: (typeof gameProjects)[number]["theme"]) {
+  const bg = hexToRgb(theme.bgBase);
+  const idle = hexToRgb(theme.pixelIdle);
+  const wave = hexToRgb(theme.pixelWave);
+  const glow = hexToRgb(theme.pixelGlow);
+  return {
+    bgR: bg[0],
+    bgG: bg[1],
+    bgB: bg[2],
+    idleR: idle[0],
+    idleG: idle[1],
+    idleB: idle[2],
+    waveR: wave[0],
+    waveG: wave[1],
+    waveB: wave[2],
+    glowR: glow[0],
+    glowG: glow[1],
+    glowB: glow[2],
+  };
+}
+
 /**
  * Shared dynamic large-pixel background for Game Projects (Sections 1..4).
  * - Autonomous animated solid-pixel waves tuned to each project's color palette.
@@ -31,41 +52,12 @@ export function ProjectPixelBackdrop() {
     ? gameProjects[activeIndex - 1].theme
     : gameProjects[0].theme;
 
-  const paletteRef = useRef({
-    bgR: 3,
-    bgG: 10,
-    bgB: 7,
-    idleR: 7,
-    idleG: 28,
-    idleB: 19,
-    waveR: 13,
-    waveG: 56,
-    waveB: 38,
-    glowR: 0,
-    glowG: 255,
-    glowB: 136,
-  });
+  const paletteRef = useRef(paletteFromTheme(gameProjects[0].theme));
 
   // Morph background palette smoothly whenever active project changes
   useEffect(() => {
-    const bg = hexToRgb(projectTheme.bgBase);
-    const idle = hexToRgb(projectTheme.pixelIdle);
-    const wave = hexToRgb(projectTheme.pixelWave);
-    const glow = hexToRgb(projectTheme.pixelGlow);
-
     gsap.to(paletteRef.current, {
-      bgR: bg[0],
-      bgG: bg[1],
-      bgB: bg[2],
-      idleR: idle[0],
-      idleG: idle[1],
-      idleB: idle[2],
-      waveR: wave[0],
-      waveG: wave[1],
-      waveB: wave[2],
-      glowR: glow[0],
-      glowG: glow[1],
-      glowB: glow[2],
+      ...paletteFromTheme(projectTheme),
       duration: reducedMotion ? 0 : 0.55,
       ease: "power2.out",
     });
