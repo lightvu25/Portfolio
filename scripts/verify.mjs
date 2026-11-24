@@ -719,7 +719,213 @@ async function main() {
     await rmContext.close();
     notes.push("Reduced-motion boot bypass verified cleanly.");
 
-    // 5. Output chunk summary
+    // 5. Cloudflare Static Export Readiness: out/ integrity, wrangler.jsonc, SPA <Link> navigation, direct nested refresh, custom 404 & secret scan
+    console.log(
+      "5. Auditing Cloudflare static-assets readiness, SPA nav, refresh & 404..."
+    );
+
+    const expectedStaticArtifacts = [
+      "404.html",
+      "robots.txt",
+      "sitemap.xml",
+      "icon.svg",
+      "favicon.ico",
+      "_headers",
+    ];
+    for (const relPath of expectedStaticArtifacts) {
+      const absPath = path.join(OUT_DIR, relPath);
+      const ok = fs.existsSync(absPath) && fs.statSync(absPath).size > 0;
+      assert(ok, `Missing or empty static export artifact: out/${relPath}`);
+    }
+
+    const expectedRscAliasDirs = [
+      "",
+      "web-service",
+      "web-service/work",
+      "web-service/work/bau-chup-choet",
+      "web-service/services",
+    ];
+    for (const relDir of expectedRscAliasDirs) {
+      const targetDir = relDir ? path.join(OUT_DIR, relDir) : OUT_DIR;
+      const hasFlattenedRsc = fs.existsSync(targetDir)
+        ? fs
+            .readdirSync(targetDir)
+            .some(
+              (f) =>
+                /^__next\..+\.__PAGE__\.txt$/.test(f) &&
+                fs.statSync(path.join(targetDir, f)).size > 0
+            )
+        : false;
+      assert(
+        hasFlattenedRsc,
+        `Missing flattened __next.*.__PAGE__.txt RSC alias in out/${relDir || "."}`
+      );
+    }
+
+    const staticMediaDir = path.join(OUT_DIR, "_next/static/media");
+    const fontFiles = fs.existsSync(staticMediaDir)
+      ? fs
+          .readdirSync(staticMediaDir)
+          .filter((f) => /\.(woff2?|ttf|otf)$/i.test(f))
+      : [];
+    assert(
+      fontFiles.length > 0,
+      "Expected bundled font files in out/_next/static/media/"
+    );
+
+    const parseJsonc = (raw) => {
+      const stripped = raw
+        .replace(/\\"|"(?:\\"|[^"])*"|(\/\/.*|\/\*[\s\S]*?\*\/)/g, (m, g) =>
+          g ? "" : m
+        )
+        .replace(/,\s*([}\]])/g, "$1");
+      return JSON.parse(stripped);
+    };
+
+    const wranglerPath = path.resolve(process.cwd(), "wrangler.jsonc");
+    assert(fs.existsSync(wranglerPath), "Expected root wrangler.jsonc file");
+    if (fs.existsSync(wranglerPath)) {
+      let wranglerCfg = null;
+      let parseErr = "";
+      try {
+        wranglerCfg = parseJsonc(fs.readFileSync(wranglerPath, "utf8"));
+      } catch (err) {
+        parseErr = err instanceof Error ? err.message : String(err);
+      }
+      assert(
+        Boolean(
+          !parseErr &&
+            wranglerCfg &&
+            wranglerCfg.name === "portfolio" &&
+            wranglerCfg.main === undefined &&
+            wranglerCfg.assets?.directory === "./out" &&
+            wranglerCfg.assets?.html_handling === "auto-trailing-slash" &&
+            wranglerCfg.assets?.not_found_handling === "404-page"
+        ),
+        `Invalid wrangler.jsonc Cloudflare Static Assets config: ${parseErr || JSON.stringify(wranglerCfg)}`
+      );
+    }
+
+    const navContext = await browser.newContext({
+      viewport: { width: 1280, height: 900 },
+    });
+    const navPage = await navContext.newPage();
+    const navConsoleErrors = [];
+    const navPageErrors = [];
+    const navHttpErrors = [];
+    navPage.on("console", (msg) => {
+      if (msg.type() === "error") navConsoleErrors.push(msg.text());
+    });
+    navPage.on("pageerror", (err) => {
+      navPageErrors.push(err.message);
+    });
+    navPage.on("response", (res) => {
+      if (res.status() >= 400) {
+        navHttpErrors.push(`${res.status()} ${res.url()}`);
+      }
+    });
+
+    await navPage.goto(`${baseUrl}/web-service/`, { waitUntil: "networkidle" });
+    await navPage
+      .locator('header nav[aria-label="Primary navigation"]')
+      .getByRole("link", { name: /^work$/i })
+      .click();
+    await navPage.waitForURL("**/web-service/work/", { timeout: 4000 });
+    await navPage.waitForLoadState("networkidle");
+
+    await navPage
+      .getByRole("link", { name: /read case study/i })
+      .first()
+      .click();
+    await navPage.waitForURL("**/web-service/work/bau-chup-choet/", {
+      timeout: 4000,
+    });
+    await navPage.waitForLoadState("networkidle");
+
+    await navPage
+      .locator('header nav[aria-label="Primary navigation"]')
+      .getByRole("link", { name: /^services$/i })
+      .click();
+    await navPage.waitForURL("**/web-service/services/", { timeout: 4000 });
+    await navPage.waitForLoadState("networkidle");
+
+    // Direct nested route access + full browser refresh
+    const directRes = await navPage.goto(
+      `${baseUrl}/web-service/work/bau-chup-choet/`,
+      { waitUntil: "networkidle" }
+    );
+    assert(
+      directRes?.status() === 200,
+      `Expected HTTP 200 for direct nested route, got ${directRes?.status()}`
+    );
+    const reloadRes = await navPage.reload({ waitUntil: "networkidle" });
+    assert(
+      reloadRes?.status() === 200,
+      `Expected HTTP 200 after page refresh on nested route, got ${reloadRes?.status()}`
+    );
+    const caseHeading = (
+      await navPage.locator("#main-content h1").first().textContent()
+    )?.trim();
+    assert(
+      Boolean(caseHeading && caseHeading.length > 0),
+      `Expected non-empty #main-content <h1> after reload, got '${caseHeading}'`
+    );
+
+    assert(
+      navHttpErrors.length === 0,
+      `HTTP >=400 responses during SPA nav / refresh: ${navHttpErrors.join(" | ")}`
+    );
+    assert(
+      navConsoleErrors.length === 0,
+      `Console errors during SPA nav / refresh: ${navConsoleErrors.join(" | ")}`
+    );
+    assert(
+      navPageErrors.length === 0,
+      `Uncaught errors during SPA nav / refresh: ${navPageErrors.join(" | ")}`
+    );
+    await navContext.close();
+
+    // Verify custom 404 handling on unknown route in separate context (browser logs 404 resource error as expected)
+    const notFoundCtx = await browser.newContext({
+      viewport: { width: 1280, height: 800 },
+    });
+    const notFoundPage = await notFoundCtx.newPage();
+    const notFoundRes = await notFoundPage.goto(
+      `${baseUrl}/missing-route-verify-404/`,
+      { waitUntil: "domcontentloaded" }
+    );
+    const notFoundText = await notFoundPage.locator("body").innerText();
+    assert(
+      notFoundRes?.status() === 404 &&
+        notFoundText.includes("This page could not be found."),
+      `Expected HTTP 404 with custom 404 page, got status=${notFoundRes?.status()}`
+    );
+    await notFoundCtx.close();
+
+    // Scan static export artifacts for accidental secrets
+    const secretRegex =
+      /CLOUDFLARE_API_TOKEN|-----BEGIN [A-Z ]*PRIVATE KEY-----|sk_live_[0-9a-zA-Z]{16,}/;
+    const scanOutSecrets = (dir) => {
+      for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+        const full = path.join(dir, entry.name);
+        if (entry.isDirectory()) {
+          scanOutSecrets(full);
+        } else if (/\.(html|js|txt|xml)$/i.test(entry.name)) {
+          const content = fs.readFileSync(full, "utf8");
+          const m = content.match(secretRegex);
+          if (m) {
+            failures.push(`Potential secret pattern '${m[0]}' found in ${full}`);
+          }
+        }
+      }
+    };
+    scanOutSecrets(OUT_DIR);
+
+    notes.push(
+      "Cloudflare static export integrity, wrangler.jsonc, client-side <Link> nav, nested refresh, custom 404 & secret scan verified."
+    );
+
+    // 6. Output chunk summary
     const chunksDir = path.join(OUT_DIR, "_next/static/chunks");
     if (fs.existsSync(chunksDir)) {
       const chunkFiles = fs

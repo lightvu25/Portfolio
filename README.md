@@ -97,5 +97,5 @@ npm run verify
 
 ## Deployment & Git Notes
 
-- **Static Export:** `npm run build` outputs a pure static site to `./out/`, ready for **Vercel**, **Netlify**, **Cloudflare Pages**, or **GitHub Pages**.
+- **Static Export & Cloudflare:** `npm run build` outputs a pure static site to `./out/` (`output: "export"`, `trailingSlash: true`, `images.unoptimized: true`, plus `scripts/postbuild-static.mjs` for static RSC navigation aliases and `public/_headers` for caching/security headers). `wrangler.jsonc` configures Cloudflare Static Assets (`"assets": { "directory": "./out", "html_handling": "auto-trailing-slash", "not_found_handling": "404-page" }`, no Worker runtime/OpenNext), so both `npx wrangler deploy` (Cloudflare Workers Builds) and **Cloudflare Pages** (output directory `out`) serve the site directly from Cloudflare's static edge CDN. Also compatible with Vercel, Netlify, or GitHub Pages.
 - **Tracked `asset/` Files:** `asset/components/packages/` and the two variable fonts in `asset/fonts/` are intentionally tracked in Git because `tsconfig.json` (`@pxlkit/*`), `src/app/globals.css`, and `src/app/layout.tsx` (`next/font/local`) compile directly against them. Unused monorepo demo apps, docs, scripts, tests, and static font duplicates are ignored via `.gitignore`.
