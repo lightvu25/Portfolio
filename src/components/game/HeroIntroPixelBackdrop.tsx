@@ -20,11 +20,11 @@ const EMBER_COLORS = ["#00F0FF", "#00FF88", "#B86BFF", "#FFB800"];
 /**
  * Interactive & ambient stepped-pixel animation backdrop for the bottom Hero Intro section.
  * Renders subtle upward-drifting neon pixel embers + pointer-reactive pixel grid cells
- * while Section 0 is active, and halts its `rAF` loop automatically off-screen.
+ * at 1x CSS resolution once boot opens, and halts its `rAF` loop automatically off-screen.
  */
 export function HeroIntroPixelBackdrop() {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
-  const { activeIndex } = useMagneticScroll();
+  const { activeIndex, bootComplete } = useMagneticScroll();
   const finePointer = useFinePointer();
   const reducedMotion = useReducedMotionPref();
 
@@ -35,37 +35,40 @@ export function HeroIntroPixelBackdrop() {
     if (!canvas) return;
     const host = canvas.parentElement?.parentElement;
     if (!host) return;
-    const ctx = canvas.getContext("2d");
+    const ctx = canvas.getContext("2d", {
+      alpha: true,
+      desynchronized: true,
+    });
     if (!ctx) return;
 
     let width = 0;
     let height = 0;
-    let dpr = 1;
-    const cell = 22;
+    const cell = 28;
 
     const setup = () => {
       const rect = host.getBoundingClientRect();
       width = Math.max(Math.floor(rect.width), 1);
       height = Math.max(Math.floor(rect.height), 1);
-      dpr = Math.min(window.devicePixelRatio || 1, 2);
-      canvas.width = Math.floor(width * dpr);
-      canvas.height = Math.floor(height * dpr);
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      canvas.width = width;
+      canvas.height = height;
+      ctx.imageSmoothingEnabled = false;
     };
     setup();
 
-    if (reducedMotion || !isHeroActive) {
+    if (reducedMotion || !isHeroActive || !bootComplete) {
       ctx.clearRect(0, 0, width, height);
       if (reducedMotion) {
         const cols = Math.ceil(width / cell);
         const rows = Math.ceil(height / cell);
+        ctx.fillStyle = "#00F0FF";
+        ctx.globalAlpha = 0.12;
         for (let r = 0; r < rows; r++) {
           for (let c = 0; c < cols; c++) {
             if ((r * 7 + c * 13) % 29 !== 0) continue;
-            ctx.fillStyle = "rgba(0, 240, 255, 0.12)";
             ctx.fillRect(c * cell + 4, r * cell + 4, 6, 6);
           }
         }
+        ctx.globalAlpha = 1;
       }
       return;
     }
@@ -82,7 +85,7 @@ export function HeroIntroPixelBackdrop() {
       color: EMBER_COLORS[Math.floor(Math.random() * EMBER_COLORS.length)],
     });
 
-    const embers: IntroEmber[] = Array.from({ length: 28 }, () =>
+    const embers: IntroEmber[] = Array.from({ length: 18 }, () =>
       createEmber(true)
     );
 
@@ -110,7 +113,7 @@ export function HeroIntroPixelBackdrop() {
           const wave =
             (Math.sin(c * 0.45 + elapsed * 1.4 + r * 0.35) +
               Math.cos(c * 0.25 - elapsed * 0.9 + r * 0.55)) *
-            0.25 +
+              0.25 +
             0.5;
 
           let hoverStrength = 0;
@@ -126,10 +129,12 @@ export function HeroIntroPixelBackdrop() {
 
           if (hoverStrength > 0.04) {
             const qHover = Math.ceil(hoverStrength * 4) / 4;
-            ctx.fillStyle = `rgba(0, 240, 255, ${(qHover * 0.22).toFixed(2)})`;
+            ctx.fillStyle = "#00F0FF";
+            ctx.globalAlpha = qHover * 0.22;
             ctx.fillRect(px, py, block, block);
           } else if (wave > 0.84) {
-            ctx.fillStyle = "rgba(0, 255, 136, 0.06)";
+            ctx.fillStyle = "#00FF88";
+            ctx.globalAlpha = 0.06;
             ctx.fillRect(px, py, block, block);
           }
         }
@@ -197,14 +202,19 @@ export function HeroIntroPixelBackdrop() {
       window.removeEventListener("pointermove", onPointerMove);
       document.documentElement.removeEventListener("mouseleave", onPointerLeave);
     };
-  }, [isHeroActive, finePointer, reducedMotion]);
+  }, [isHeroActive, bootComplete, finePointer, reducedMotion]);
 
   return (
     <div
       aria-hidden="true"
       className="pointer-events-none absolute inset-0 z-0 overflow-hidden"
     >
-      <canvas data-hero-intro-canvas="" ref={canvasRef} className="h-full w-full" />
+      <canvas
+        data-hero-intro-canvas=""
+        ref={canvasRef}
+        style={{ imageRendering: "pixelated" }}
+        className="h-full w-full"
+      />
     </div>
   );
 }

@@ -176,14 +176,16 @@ async function main() {
           Math.abs(cy - window.innerHeight / 2) < 60,
         hasScanCanvas: Boolean(document.querySelector("[data-boot-scan-canvas]")),
         hasSplitCurtains: Boolean(topCurtain && bottomCurtain),
+        hasTrailCanvas: Boolean(document.querySelector("[data-curtain-trail-canvas]")),
       };
     });
     assert(
       bootAudit.beamFullWidth &&
         bootAudit.hasScanCanvas &&
         bootAudit.loaderCentered &&
-        bootAudit.hasSplitCurtains,
-      `Expected full-screen pixel scan beam, centered progress bar & dual pixel curtains during boot (${JSON.stringify(bootAudit)})`
+        bootAudit.hasSplitCurtains &&
+        bootAudit.hasTrailCanvas,
+      `Expected full-screen pixel scan beam, centered progress bar, dual pixel curtains & trail canvas during boot (${JSON.stringify(bootAudit)})`
     );
 
     await gamePage.screenshot({
@@ -191,7 +193,36 @@ async function main() {
       fullPage: false,
     });
 
-    // Wait for Q -> QUANG boot sequence to finish
+    // Wait for mid-open vertical split-curtain pixel trail & capture screenshot
+    await gamePage.waitForFunction(
+      () => {
+        const topCurtain = document.querySelector('[data-pixel-curtain="top"]');
+        if (!topCurtain) return false;
+        const b = topCurtain.getBoundingClientRect().bottom;
+        return b < window.innerHeight * 0.42 && b > 40;
+      },
+      null,
+      { timeout: 5000 }
+    );
+    await gamePage.waitForTimeout(40);
+    const curtainSymmetry = await gamePage.evaluate(() => {
+      const topCurtain = document.querySelector('[data-pixel-curtain="top"]');
+      const bottomCurtain = document.querySelector('[data-pixel-curtain="bottom"]');
+      const topBottom = topCurtain ? topCurtain.getBoundingClientRect().bottom : -1;
+      const bottomTop = bottomCurtain ? bottomCurtain.getBoundingClientRect().top : -1;
+      const gapDiff = Math.abs(topBottom - (window.innerHeight - bottomTop));
+      return { topBottom, bottomTop, innerHeight: window.innerHeight, gapDiff };
+    });
+    assert(
+      curtainSymmetry.topBottom >= 0 && curtainSymmetry.gapDiff <= 6,
+      `Expected symmetrical vertical curtain opening (${JSON.stringify(curtainSymmetry)})`
+    );
+    await gamePage.screenshot({
+      path: path.join(SCREENSHOT_DIR, "game-boot-curtain-trail.png"),
+      fullPage: false,
+    });
+
+    // Wait for vertical split-curtain + trail sequence to finish unmounting
     await gamePage.waitForFunction(
       () => !document.querySelector('[data-testid="boot-sequence-overlay"]'),
       null,

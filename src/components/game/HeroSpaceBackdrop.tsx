@@ -18,25 +18,28 @@ const CELL = 24;
 /**
  * Top-half Hero background behind the `QUANG` 3D ASCII stage: subtle retro pixel
  * grid with neon dust motes and cursor-reactive spark highlights.
+ * Defers animation until boot curtains finish revealing & renders at 1x CSS resolution.
  */
 export function HeroSpaceBackdrop() {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
-  const { activeIndex } = useMagneticScroll();
+  const { activeIndex, bootComplete } = useMagneticScroll();
   const finePointer = useFinePointer();
   const reducedMotion = useReducedMotionPref();
 
   useEffect(() => {
-    if (activeIndex !== 0 || reducedMotion) return;
+    if (!bootComplete || activeIndex !== 0 || reducedMotion) return;
     const canvas = canvasRef.current;
     if (!canvas) return;
     const host = canvas.parentElement;
     if (!host) return;
-    const ctx = canvas.getContext("2d");
+    const ctx = canvas.getContext("2d", {
+      alpha: true,
+      desynchronized: true,
+    });
     if (!ctx) return;
 
     let width = 0;
     let height = 0;
-    let dpr = 1;
     let rafId = 0;
     let last = 0;
     let elapsed = 0;
@@ -47,10 +50,9 @@ export function HeroSpaceBackdrop() {
       const rect = host.getBoundingClientRect();
       width = Math.max(Math.floor(rect.width), 1);
       height = Math.max(Math.floor(rect.height), 1);
-      dpr = Math.min(window.devicePixelRatio || 1, 2);
-      canvas.width = Math.floor(width * dpr);
-      canvas.height = Math.floor(height * dpr);
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      canvas.width = width;
+      canvas.height = height;
+      ctx.imageSmoothingEnabled = false;
     };
     resize();
 
@@ -72,10 +74,8 @@ export function HeroSpaceBackdrop() {
           const wave = Math.sin(elapsed * 1.4 + hash * 0.1) * 0.5 + 0.5;
           if (wave < 0.35) continue;
           const alpha = ((wave - 0.35) / 0.65) * 0.18;
-          ctx.fillStyle =
-            hash % 3 === 0
-              ? `rgba(0, 255, 136, ${alpha.toFixed(3)})`
-              : `rgba(0, 240, 255, ${alpha.toFixed(3)})`;
+          ctx.globalAlpha = alpha;
+          ctx.fillStyle = hash % 3 === 0 ? "#00FF88" : "#00F0FF";
           ctx.fillRect(c * CELL + 6, r * CELL + 6, CELL - 12, CELL - 12);
         }
       }
@@ -93,8 +93,8 @@ export function HeroSpaceBackdrop() {
           ctx.fillStyle = s.color;
           ctx.fillRect(s.gx * CELL + 2, s.gy * CELL + 2, CELL - 4, CELL - 4);
         }
-        ctx.globalAlpha = 1;
       }
+      ctx.globalAlpha = 1;
 
       rafId = requestAnimationFrame(draw);
     };
@@ -136,7 +136,7 @@ export function HeroSpaceBackdrop() {
       ro.disconnect();
       window.removeEventListener("pointermove", onPointerMove);
     };
-  }, [activeIndex, finePointer, reducedMotion]);
+  }, [activeIndex, bootComplete, finePointer, reducedMotion]);
 
   return (
     <div
@@ -152,7 +152,11 @@ export function HeroSpaceBackdrop() {
           backgroundSize: "24px 24px",
         }}
       />
-      <canvas ref={canvasRef} className="absolute inset-0 h-full w-full" />
+      <canvas
+        ref={canvasRef}
+        style={{ imageRendering: "pixelated" }}
+        className="absolute inset-0 h-full w-full"
+      />
     </div>
   );
 }
